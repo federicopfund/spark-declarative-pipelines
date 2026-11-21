@@ -1,0 +1,8 @@
+relationship e174770e-8849-5677-8f9a-2e9d4b38b206
+	fromColumn: orders.customer_id
+	toColumn: customers.customer_id
+
+relationship 4a681de2-cb97-5e7d-af7f-1427fff512a5
+	fromColumn: customers_history.customer_id
+	toColumn: customers.customer_id
+

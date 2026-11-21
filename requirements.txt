@@ -1,0 +1,9 @@
+# Dependencias de pyspark[pipelines] 4.3.0 (Spark Connect + CLI spark-pipelines).
+# PySpark en si NO se instala con pip: se usa el que trae SPARK_HOME/python (misma version que el servidor).
+pandas>=2.2.0,<3.0.0
+pyarrow>=18.0.0
+grpcio>=1.76.0
+grpcio-status>=1.76.0
+googleapis-common-protos>=1.71.0
+zstandard>=0.25.0
+pyyaml>=3.11

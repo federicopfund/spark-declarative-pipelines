@@ -1,0 +1,5 @@
+{"customer_id": 1, "name": "Ana Torres", "email": "ana@example.com", "country": "Argentina", "op": "INSERT", "version": 1, "event_ts": "2026-11-01T09:00:00"}
+{"customer_id": 2, "name": "Bruno Diaz", "email": "bruno@example.com", "country": "Chile", "op": "INSERT", "version": 1, "event_ts": "2026-11-01T09:05:00"}
+{"customer_id": 3, "name": "Carla Perez", "email": "carla@example.com", "country": "Uruguay", "op": "INSERT", "version": 1, "event_ts": "2026-11-01T09:10:00"}
+{"customer_id": 4, "name": "Diego Ruiz", "email": "diego@example.com", "country": "Argentina", "op": "INSERT", "version": 1, "event_ts": "2026-11-01T09:15:00"}
+{"customer_id": 5, "name": "Elena Sosa", "email": "elena@example.com", "country": "Peru", "op": "INSERT", "version": 1, "event_ts": "2026-11-01T09:20:00"}

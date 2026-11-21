@@ -1,0 +1,40 @@
+# ---- Python ----
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# ---- Estado de ejecucion (lo generan el cluster y el pipeline; se regenera con bin\reset-pipeline) ----
+logs/
+work/
+storage/
+warehouse/
+spark-warehouse/
+metastore_db/
+derby.log
+data/landing/
+data/export/
+
+# Spec renderizada por bin\spark-pipelines (la versionada es la plantilla spark-pipeline.yml)
+pipelines/**/spark-pipeline.local.yml
+
+# ---- Binarios de terceros (se descargan con bin\setup-dependencies) ----
+tools/
+jars/*.jar
+jars/disabled/*.jar
+
+# ---- Power BI: estado por usuario/maquina ----
+bi/powerbi/**/.pbi/localSettings.json
+bi/powerbi/**/.pbi/cache.abf
+*.pbix.bak
+
+# ---- Editores / SO ----
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# ---- Configuracion local de Claude Code ----
+.claude/settings.local.json

@@ -1,0 +1,65 @@
+/// Ventas agregadas por pais del cliente (capa gold).
+table sales_by_country
+	lineageTag: 0692165d-1c37-57d7-84d0-8990d8c18fda
+
+	/// Importe total por pais, ya agregado en la capa gold.
+	measure 'Ventas por país' = SUM ( sales_by_country[total_amount] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 9714c50c-f137-5401-ae79-c180536e1c7e
+
+	column country
+		dataType: string
+		lineageTag: 3b0f010b-5249-56f8-be86-c8b98efa76f5
+		summarizeBy: none
+		sourceColumn: country
+
+		annotation SummarizationSetBy = Automatic
+
+	column orders
+		dataType: int64
+		formatString: #,0
+		lineageTag: 63fcb6b2-d5de-5d49-9ec1-983f79ec5c10
+		summarizeBy: sum
+		sourceColumn: orders
+
+		annotation SummarizationSetBy = Automatic
+
+	column customers
+		dataType: int64
+		formatString: #,0
+		lineageTag: c425a4e3-b596-52e7-bc79-3c692a8b2ab4
+		summarizeBy: sum
+		sourceColumn: customers
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_amount
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: db8f4dbe-9c01-57ee-9c22-49250af35112
+		summarizeBy: sum
+		sourceColumn: total_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column average_order
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: a1ebcb60-53c9-5cb6-b106-a07bf115c70b
+		summarizeBy: none
+		sourceColumn: average_order
+
+		annotation SummarizationSetBy = Automatic
+
+	partition sales_by_country = m
+		mode: import
+		source =
+				let
+				    Source = ApacheSpark.Tables(SparkServer, 0, [BatchSize = null]),
+				    Data = Source{[Schema = "retail", Item = "sales_by_country"]}[Data],
+				    Typed = Table.TransformColumnTypes(Data, {{"country", type text}, {"orders", Int64.Type}, {"customers", Int64.Type}, {"total_amount", Currency.Type}, {"average_order", Currency.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

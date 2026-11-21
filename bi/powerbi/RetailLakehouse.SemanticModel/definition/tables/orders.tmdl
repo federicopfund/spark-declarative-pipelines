@@ -1,0 +1,79 @@
+/// Pedidos unificados de los canales web y tienda (capa silver).
+table orders
+	lineageTag: 11299424-6787-54c5-8bba-1311343a4f61
+
+	/// Suma del importe de los pedidos.
+	measure 'Ventas totales' = SUM ( orders[amount] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 74457d5a-ba95-5924-a3de-d4dc62017e2b
+
+	/// Cantidad de pedidos.
+	measure Pedidos = COUNTROWS ( orders )
+		formatString: #,0
+		lineageTag: 354565c8-1b4d-5e49-80ff-3b73ec405524
+
+	/// Clientes distintos que hicieron al menos un pedido.
+	measure 'Clientes con compras' = DISTINCTCOUNT ( orders[customer_id] )
+		formatString: #,0
+		lineageTag: 2d30ec9b-39a8-5b59-b02b-8ef02db3e28c
+
+	/// Importe promedio por pedido.
+	measure 'Ticket promedio' = DIVIDE ( [Ventas totales], [Pedidos] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: f2de1509-e3a7-5b3d-9dfa-5561a2102d43
+
+	column order_id
+		dataType: string
+		lineageTag: 1c2bc198-961c-51d9-bc25-e263c787533f
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_id
+		dataType: int64
+		formatString: 0
+		lineageTag: e3a82811-c666-5d43-97d0-478865e02c98
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column amount
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 7d59489b-77a8-5a4a-9b45-c28a740ac4e8
+		summarizeBy: sum
+		sourceColumn: amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_ts
+		dataType: dateTime
+		formatString: dd/mm/yyyy hh:nn
+		lineageTag: a926a674-d8e5-58af-88a6-c445be4ffd11
+		summarizeBy: none
+		sourceColumn: order_ts
+
+		annotation SummarizationSetBy = Automatic
+
+	column channel
+		dataType: string
+		lineageTag: 56a9690f-da29-5ec4-9769-598ba57a7273
+		summarizeBy: none
+		sourceColumn: channel
+
+		annotation SummarizationSetBy = Automatic
+
+	partition orders = m
+		mode: import
+		source =
+				let
+				    Source = ApacheSpark.Tables(SparkServer, 0, [BatchSize = null]),
+				    Data = Source{[Schema = "retail", Item = "orders"]}[Data],
+				    Typed = Table.TransformColumnTypes(Data, {{"order_id", type text}, {"customer_id", Int64.Type}, {"amount", Currency.Type}, {"order_ts", type datetime}, {"channel", type text}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

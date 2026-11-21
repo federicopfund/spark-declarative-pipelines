@@ -1,0 +1,23 @@
+# Normaliza finales de linea en el repo (LF) y fija los que cada herramienta necesita al hacer checkout.
+* text=auto eol=lf
+
+# Windows: scripts de PowerShell y cmd con CRLF
+*.ps1  text eol=crlf
+*.cmd  text eol=crlf
+*.bat  text eol=crlf
+
+# Power BI Desktop escribe CRLF en los archivos del proyecto PBIP
+*.tmdl     text eol=crlf
+*.pbip     text eol=crlf
+*.pbir     text eol=crlf
+*.pbism    text eol=crlf
+bi/powerbi/**/*.json  text eol=crlf
+bi/powerbi/**/.platform text eol=crlf
+
+# Binarios
+*.png  binary
+*.jpg  binary
+*.jar  binary
+*.pbix binary
+*.abf  binary
+*.parquet binary

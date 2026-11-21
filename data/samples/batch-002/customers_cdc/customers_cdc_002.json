@@ -1,0 +1,5 @@
+{"customer_id": 2, "name": "Bruno Diaz", "email": "bruno.diaz@example.com", "country": "Argentina", "op": "UPDATE", "version": 2, "event_ts": "2026-11-02T08:00:00"}
+{"customer_id": 4, "name": "Diego Ruiz", "email": "diego@example.com", "country": "Argentina", "op": "DELETE", "version": 2, "event_ts": "2026-11-02T08:30:00"}
+{"customer_id": 3, "name": "Carla Perez", "email": "carla.p@example.com", "country": "Brasil", "op": "UPDATE", "version": 3, "event_ts": "2026-11-02T09:00:00"}
+{"customer_id": 6, "name": "Facundo Gil", "email": "facu@example.com", "country": "Chile", "op": "INSERT", "version": 1, "event_ts": "2026-11-02T09:30:00"}
+{"customer_id": 2, "name": "Bruno Diaz", "email": "bruno.diaz@example.com", "country": "Argentina", "op": "UPDATE", "version": 2, "event_ts": "2026-11-02T08:00:00"}

@@ -1,0 +1,26 @@
+# Spark Declarative Pipelines - spec del pipeline retail_lakehouse (Spark 4.3.0)
+#
+# Es una PLANTILLA: ${PROJECT_ROOT_URI} se reemplaza por la ruta del proyecto (file:///...) al correr
+#   bin\spark-pipelines run
+# que escribe spark-pipeline.local.yml (ignorado por Git) junto a este archivo y lo pasa como --spec.
+# Asi el repo no lleva rutas absolutas de ninguna maquina.
+
+name: retail_lakehouse
+
+# Datasets de las capas bronze / silver / gold (+ exportaciones), en Python y SQL
+libraries:
+  - glob:
+      include: transformations/**
+
+# Checkpoints de los streaming tables (SDP exige una ruta absoluta)
+storage: ${PROJECT_ROOT_URI}/storage
+
+# Base de datos destino en el metastore Hive
+database: retail
+
+configuration:
+  spark.sql.shuffle.partitions: "4"
+  # Raiz de los archivos que llegan (los lee la capa bronze)
+  retail.landing.root: ${PROJECT_ROOT_URI}/data/landing
+  # Raiz de las exportaciones (sink)
+  retail.export.root: ${PROJECT_ROOT_URI}/data/export
