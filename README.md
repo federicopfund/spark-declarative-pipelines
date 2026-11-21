@@ -215,18 +215,6 @@ son estado de ejecución: se generan al correr y no se versionan.
 
 ![PowerShell](https://img.shields.io/badge/PowerShell-5.1-5391FE?logo=powershell&logoColor=white)
 
-```mermaid
-flowchart TD
-    A["1 · Entorno Python<br/><code>python -m venv .venv</code>"] --> B["2 · Dependencias<br/><code>bin\setup-dependencies</code>"]
-    B --> C["3 · Levantar servicios<br/><code>bin\start-cluster</code>"]
-    C --> D["4 · Aterrizar un lote<br/><code>bin\land-batch -Batch N</code>"]
-    D --> E["5 · Ejecutar el pipeline<br/><code>bin\spark-pipelines run</code>"]
-    E --> F["6a · Consultar<br/><code>bin\query-lakehouse</code>"]
-    E --> G["6b · Power BI<br/>abrir el .pbip y Actualizar"]
-    E -- "siguiente lote" --> D
-    C -. "al terminar" .-> H["<code>bin\stop-cluster</code>"]
-```
-
 ```powershell
 # 1. Entorno Python (PySpark se usa desde SPARK_HOME\python, no se instala con pip)
 python -m venv .venv
