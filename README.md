@@ -4,10 +4,117 @@ Lakehouse de ejemplo con arquitectura medallón (bronze → silver → gold) con
 **Spark Declarative Pipelines (SDP)** sobre **Apache Spark 4.3**, con ingesta incremental,
 Change Data Capture (SCD tipo 1 y 2) y un reporte de **Power BI** conectado por el Thrift JDBC/ODBC Server.
 
+## Flujo de datos
+
+```mermaid
+flowchart LR
+    subgraph LANDING["data/landing"]
+        direction TB
+        FW["orders_web/*.json"]
+        FS["orders_store/*.csv"]
+        FC["customers_cdc/*.json"]
+    end
+
+    subgraph BRONZE["🥉 Bronze"]
+        direction TB
+        OWR["orders_web_raw"]
+        OSR["orders_store_raw"]
+        CCE["customers_cdc_events"]
+    end
+
+    subgraph SILVER["🥈 Silver"]
+        direction TB
+        ORD["orders<br/><i>unión + dedup por order_id</i>"]
+        CUS["customers<br/><i>SCD tipo 1</i>"]
+        HIS["customers_history<br/><i>SCD tipo 2</i>"]
+        ENR(["orders_enriched<br/><i>vista temporal</i>"])
+    end
+
+    subgraph GOLD["🥇 Gold"]
+        direction TB
+        SBC["sales_by_country"]
+        DSC["daily_sales_by_channel"]
+    end
+
+    EXP[["orders_export<br/><i>sink JSON → data/export</i>"]]
+    PBI{{"Power BI<br/>RetailLakehouse"}}
+
+    FW --> OWR
+    FS --> OSR
+    FC --> CCE
+
+    OWR --> ORD
+    OSR --> ORD
+    CCE -- "CDC" --> CUS
+    CCE -- "CDC" --> HIS
+
+    OWR --> EXP
+    OSR --> EXP
+
+    ORD --> ENR
+    CUS --> ENR
+    ENR --> SBC
+    ENR --> DSC
+
+    ORD -. "Thrift / ODBC" .-> PBI
+    CUS -.-> PBI
+    HIS -.-> PBI
+    SBC -.-> PBI
+    DSC -.-> PBI
 ```
-data/landing ──► bronze (streaming tables) ──► silver (CDC, unión de canales) ──► gold (agregados) ──► Power BI
-                                                                    └──► exports (sink JSON)
+
+- **Landing** recibe archivos por lote (JSON y CSV), simulando lo que llega de los sistemas de origen.
+- **Bronze** (streaming tables) lee de forma incremental solo los archivos nuevos de cada carpeta (checkpoints en `storage/`).
+- **Silver** une los canales sin duplicados y aplica los eventos de cambio de clientes: versión vigente (SCD1)
+  e historial completo con `__START_AT` / `__END_AT` (SCD2).
+- **Gold** (materialized views) agrega sobre `orders_enriched` (pedidos + país actual del cliente), una vista que solo existe durante la ejecución.
+- **Exports** publica los pedidos nuevos fuera del pipeline, en un único flow para los dos canales.
+- **Power BI** importa silver y gold por el Thrift JDBC/ODBC Server.
+
+## Arquitectura en ejecución
+
+```mermaid
+flowchart LR
+    subgraph CLIENTS["Clientes"]
+        direction TB
+        SDP["spark-pipelines<br/>(CLI de SDP)"]
+        PY["clients/*.py<br/>(PySpark)"]
+        BI["Power BI Desktop"]
+        BL["beeline"]
+    end
+
+    subgraph DRIVERS["Drivers Spark"]
+        direction TB
+        CON["Spark Connect<br/>:15002"]
+        THR["Thrift JDBC/ODBC<br/>:10000"]
+    end
+
+    subgraph CLUSTER["Spark Standalone"]
+        direction TB
+        MAS["Master :7077"]
+        WRK["Worker<br/>ejecutores"]
+    end
+
+    DER[("Derby · metastore Hive<br/>:1527")]
+    WH[("warehouse/<br/>tablas Parquet")]
+
+    SDP -- "gRPC" --> CON
+    PY -- "gRPC" --> CON
+    BI -- "ODBC" --> THR
+    BL -- "JDBC" --> THR
+
+    CON --> MAS
+    THR --> MAS
+    MAS --> WRK
+    WRK --> WH
+
+    CON -. "catálogo" .-> DER
+    THR -. "catálogo" .-> DER
 ```
+
+Spark Connect recibe planes de DataFrame (código); el Thrift Server recibe SQL (herramientas de BI). Los dos
+comparten el cluster y el catálogo: Derby corre en modo red porque en modo embebido admite una sola JVM.
+Detalle en [`docs/architecture.md`](docs/architecture.md).
 
 ## Stack
 
@@ -54,6 +161,18 @@ son estado de ejecución: se generan al correr y no se versionan.
   *Store reports using enhanced metadata format (PBIR)* activada
 
 ## Puesta en marcha
+
+```mermaid
+flowchart TD
+    A["1 · Entorno Python<br/><code>python -m venv .venv</code>"] --> B["2 · Dependencias<br/><code>bin\setup-dependencies</code>"]
+    B --> C["3 · Levantar servicios<br/><code>bin\start-cluster</code>"]
+    C --> D["4 · Aterrizar un lote<br/><code>bin\land-batch -Batch N</code>"]
+    D --> E["5 · Ejecutar el pipeline<br/><code>bin\spark-pipelines run</code>"]
+    E --> F["6a · Consultar<br/><code>bin\query-lakehouse</code>"]
+    E --> G["6b · Power BI<br/>abrir el .pbip y Actualizar"]
+    E -- "siguiente lote" --> D
+    C -. "al terminar" .-> H["<code>bin\stop-cluster</code>"]
+```
 
 ```powershell
 # 1. Entorno Python (PySpark se usa desde SPARK_HOME\python, no se instala con pip)
