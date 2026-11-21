@@ -1,39 +1,96 @@
-<!-- Procesamiento -->
+# Retail Lakehouse · Spark Declarative Pipelines
+
 ![Apache Spark](https://img.shields.io/badge/Apache%20Spark-4.3.0-E25A1C?logo=apachespark&logoColor=white)
 ![Spark Declarative Pipelines](https://img.shields.io/badge/Spark-Declarative%20Pipelines-E25A1C?logo=apachespark&logoColor=white)
-![PySpark](https://img.shields.io/badge/PySpark-4.3-E25A1C?logo=apachespark&logoColor=white)
-![Spark Connect](https://img.shields.io/badge/Spark%20Connect-gRPC%2015002-244c5a?logo=grpc&logoColor=white)
-![Thrift](https://img.shields.io/badge/Thrift-JDBC%2FODBC%2010000-555555?logo=apache&logoColor=white)
-
-<!-- Almacenamiento y catálogo -->
-![Parquet](https://img.shields.io/badge/Apache%20Parquet-tables-50ABF1?logo=apacheparquet&logoColor=white)
-![Hive Metastore](https://img.shields.io/badge/Hive%20Metastore-Derby-FDEE21?logo=apachehive&logoColor=black)
-
-<!-- BI -->
 ![Power BI](https://img.shields.io/badge/Power%20BI-PBIP%20%2F%20TMDL-F2C811?logo=powerbi&logoColor=black)
-
-<!-- Runtime -->
 ![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
-![Java](https://img.shields.io/badge/Java-17-ED8B00?logo=openjdk&logoColor=white)
-![PowerShell](https://img.shields.io/badge/PowerShell-5.1-5391FE?logo=powershell&logoColor=white)
-![Windows](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6?logo=windows&logoColor=white)
-
-<!-- Arquitectura -->
-![Medallion](https://img.shields.io/badge/Arquitectura-Medallion%20(bronze%2Fsilver%2Fgold)-8B5A2B)
-![CDC](https://img.shields.io/badge/CDC-SCD1%20%7C%20SCD2-6A5ACD)
-![Mermaid](https://img.shields.io/badge/Diagramas-Mermaid-FF3670?logo=mermaid&logoColor=white)
-
-<!-- Proyecto -->
 ![License](https://img.shields.io/badge/Licencia-MIT-green)
-
-
-# Retail Lakehouse · Spark Declarative Pipelines
 
 Lakehouse de ejemplo con arquitectura medallón (bronze → silver → gold) construido con
 **Spark Declarative Pipelines (SDP)** sobre **Apache Spark 4.3**, con ingesta incremental,
 Change Data Capture (SCD tipo 1 y 2) y un reporte de **Power BI** conectado por el Thrift JDBC/ODBC Server.
 
+## Contenido
+
+- [Stack](#stack)
+- [Arquitectura en ejecución](#arquitectura-en-ejecución)
+- [Flujo de datos](#flujo-de-datos)
+- [Datasets](#datasets)
+- [Estructura del repositorio](#estructura-del-repositorio)
+- [Requisitos](#requisitos)
+- [Puesta en marcha](#puesta-en-marcha)
+- [Reporte de Power BI](#reporte-de-power-bi)
+- [Limitaciones](#limitaciones)
+- [Documentación](#documentación)
+- [Licencia](#licencia)
+
+## Stack
+
+| | Componente | Uso |
+|---|---|---|
+| ![Apache Spark](https://img.shields.io/badge/Apache%20Spark-4.3.0-E25A1C?logo=apachespark&logoColor=white) | Apache Spark 4.3 (Standalone: master + worker) | Motor de cómputo |
+| ![Spark Declarative Pipelines](https://img.shields.io/badge/Spark-Declarative%20Pipelines-E25A1C?logo=apachespark&logoColor=white) | Spark Declarative Pipelines | Definición declarativa de datasets y flujos |
+| ![PySpark](https://img.shields.io/badge/PySpark-4.3-E25A1C?logo=apachespark&logoColor=white) | PySpark | Transformaciones en Python y clientes |
+| ![Spark Connect](https://img.shields.io/badge/Spark%20Connect-gRPC%2015002-244c5a?logo=grpc&logoColor=white) | Spark Connect (`sc://127.0.0.1:15002`) | Ejecución del pipeline y clientes PySpark |
+| ![Thrift](https://img.shields.io/badge/Thrift-JDBC%2FODBC%2010000-555555?logo=apache&logoColor=white) | Thrift JDBC/ODBC Server (`127.0.0.1:10000`) | Acceso SQL para herramientas de BI |
+| ![Hive Metastore](https://img.shields.io/badge/Hive%20Metastore-Derby-FDEE21?logo=apachehive&logoColor=black) | Hive metastore sobre Apache Derby en modo red (`:1527`) | Catálogo compartido por Connect y Thrift |
+| ![Parquet](https://img.shields.io/badge/Apache%20Parquet-tables-50ABF1?logo=apacheparquet&logoColor=white) | Parquet | Formato de las tablas (`warehouse/`) |
+| ![Power BI](https://img.shields.io/badge/Power%20BI-PBIP%20%2F%20TMDL-F2C811?logo=powerbi&logoColor=black) | Power BI (PBIP + TMDL, conector Spark) | Reporte `RetailLakehouse` |
+
+## Arquitectura en ejecución
+
+![Spark Connect](https://img.shields.io/badge/Spark%20Connect-gRPC%2015002-244c5a?logo=grpc&logoColor=white)
+![Thrift](https://img.shields.io/badge/Thrift-JDBC%2FODBC%2010000-555555?logo=apache&logoColor=white)
+![Hive Metastore](https://img.shields.io/badge/Hive%20Metastore-Derby-FDEE21?logo=apachehive&logoColor=black)
+
+```mermaid
+flowchart LR
+    subgraph CLIENTS["Clientes"]
+        direction TB
+        SDP["spark-pipelines<br/>(CLI de SDP)"]
+        PY["clients/*.py<br/>(PySpark)"]
+        BI["Power BI Desktop"]
+        BL["beeline"]
+    end
+
+    subgraph DRIVERS["Drivers Spark"]
+        direction TB
+        CON["Spark Connect<br/>:15002"]
+        THR["Thrift JDBC/ODBC<br/>:10000"]
+    end
+
+    subgraph CLUSTER["Spark Standalone"]
+        direction TB
+        MAS["Master :7077"]
+        WRK["Worker<br/>ejecutores"]
+    end
+
+    DER[("Derby · metastore Hive<br/>:1527")]
+    WH[("warehouse/<br/>tablas Parquet")]
+
+    SDP -- "gRPC" --> CON
+    PY -- "gRPC" --> CON
+    BI -- "ODBC" --> THR
+    BL -- "JDBC" --> THR
+
+    CON --> MAS
+    THR --> MAS
+    MAS --> WRK
+    WRK --> WH
+
+    CON -. "catálogo" .-> DER
+    THR -. "catálogo" .-> DER
+```
+
+Spark Connect recibe planes de DataFrame (código); el Thrift Server recibe SQL (herramientas de BI). Los dos
+comparten el cluster y el catálogo: Derby corre en modo red porque en modo embebido admite una sola JVM.
+Detalle en [`docs/architecture.md`](docs/architecture.md).
+
 ## Flujo de datos
+
+![Medallion](https://img.shields.io/badge/Arquitectura-Medallion%20(bronze%2Fsilver%2Fgold)-8B5A2B)
+![CDC](https://img.shields.io/badge/CDC-SCD1%20%7C%20SCD2-6A5ACD)
+![Mermaid](https://img.shields.io/badge/Diagramas-Mermaid-FF3670?logo=mermaid&logoColor=white)
 
 ```mermaid
 flowchart LR
@@ -100,64 +157,23 @@ flowchart LR
 - **Exports** publica los pedidos nuevos fuera del pipeline, en un único flow para los dos canales.
 - **Power BI** importa silver y gold por el Thrift JDBC/ODBC Server.
 
-## Arquitectura en ejecución
+## Datasets
 
-```mermaid
-flowchart LR
-    subgraph CLIENTS["Clientes"]
-        direction TB
-        SDP["spark-pipelines<br/>(CLI de SDP)"]
-        PY["clients/*.py<br/>(PySpark)"]
-        BI["Power BI Desktop"]
-        BL["beeline"]
-    end
+![Parquet](https://img.shields.io/badge/Apache%20Parquet-tables-50ABF1?logo=apacheparquet&logoColor=white)
+![CDC](https://img.shields.io/badge/CDC-SCD1%20%7C%20SCD2-6A5ACD)
 
-    subgraph DRIVERS["Drivers Spark"]
-        direction TB
-        CON["Spark Connect<br/>:15002"]
-        THR["Thrift JDBC/ODBC<br/>:10000"]
-    end
+| Capa | Dataset | Tipo | Descripción |
+|---|---|---|---|
+| bronze | `orders_web_raw`, `orders_store_raw` | streaming table | Pedidos crudos por canal (JSON / CSV) |
+| bronze | `customers_cdc_events` | streaming table | Eventos de cambio de clientes |
+| silver | `orders` | materialized view | Pedidos de todos los canales, sin duplicados |
+| silver | `customers` | materialized view | Versión vigente de cada cliente (SCD1) |
+| silver | `customers_history` | materialized view | Todas las versiones (SCD2, `__START_AT`/`__END_AT`) |
+| silver | `orders_enriched` | vista temporal | Pedidos + cliente; solo durante la ejecución |
+| gold | `sales_by_country`, `daily_sales_by_channel` | materialized view | Agregados para consumo |
+| exports | `orders_export` | sink | Pedidos nuevos en JSON |
 
-    subgraph CLUSTER["Spark Standalone"]
-        direction TB
-        MAS["Master :7077"]
-        WRK["Worker<br/>ejecutores"]
-    end
-
-    DER[("Derby · metastore Hive<br/>:1527")]
-    WH[("warehouse/<br/>tablas Parquet")]
-
-    SDP -- "gRPC" --> CON
-    PY -- "gRPC" --> CON
-    BI -- "ODBC" --> THR
-    BL -- "JDBC" --> THR
-
-    CON --> MAS
-    THR --> MAS
-    MAS --> WRK
-    WRK --> WH
-
-    CON -. "catálogo" .-> DER
-    THR -. "catálogo" .-> DER
-```
-
-Spark Connect recibe planes de DataFrame (código); el Thrift Server recibe SQL (herramientas de BI). Los dos
-comparten el cluster y el catálogo: Derby corre en modo red porque en modo embebido admite una sola JVM.
-Detalle en [`docs/architecture.md`](docs/architecture.md).
-
-## Stack
-
-| Componente | Uso |
-|---|---|
-| Apache Spark 4.3 (Standalone: master + worker) | Motor de cómputo |
-| Spark Declarative Pipelines | Definición declarativa de datasets y flujos |
-| Spark Connect (`sc://127.0.0.1:15002`) | Ejecución del pipeline y clientes PySpark |
-| Thrift JDBC/ODBC Server (`127.0.0.1:10000`) | Acceso SQL para herramientas de BI |
-| Hive metastore sobre Apache Derby en modo red (`:1527`) | Catálogo compartido por Connect y Thrift |
-| Parquet | Formato de las tablas (`warehouse/`) |
-| Power BI (PBIP + TMDL, conector Spark) | Reporte `RetailLakehouse` |
-
-## Estructura
+## Estructura del repositorio
 
 ```
 ├── pipelines/retail_lakehouse/      Pipeline SDP
@@ -173,7 +189,7 @@ Detalle en [`docs/architecture.md`](docs/architecture.md).
 ├── conf/                            spark-defaults, log4j2, entorno (spark-env.ps1)
 ├── bi/powerbi/                      Proyecto Power BI (PBIP) + generador del modelo
 ├── data/samples/                    Lotes de datos de ejemplo
-├── docs/                            Arquitectura y operación
+├── docs/                            Arquitectura, operación e imágenes
 └── jars/                            Jars extra opcionales (no versionados)
 ```
 
@@ -181,6 +197,12 @@ Las carpetas `warehouse/`, `metastore_db/`, `storage/`, `logs/`, `work/`, `data/
 son estado de ejecución: se generan al correr y no se versionan.
 
 ## Requisitos
+
+![Windows](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6?logo=windows&logoColor=white)
+![PowerShell](https://img.shields.io/badge/PowerShell-5.1-5391FE?logo=powershell&logoColor=white)
+![Java](https://img.shields.io/badge/Java-17-ED8B00?logo=openjdk&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
+![Apache Spark](https://img.shields.io/badge/Apache%20Spark-4.3.0-E25A1C?logo=apachespark&logoColor=white)
 
 - Windows 10/11 con PowerShell 5.1
 - Java 17 (`JAVA_HOME`)
@@ -190,6 +212,8 @@ son estado de ejecución: se generan al correr y no se versionan.
   *Store reports using enhanced metadata format (PBIR)* activada
 
 ## Puesta en marcha
+
+![PowerShell](https://img.shields.io/badge/PowerShell-5.1-5391FE?logo=powershell&logoColor=white)
 
 ```mermaid
 flowchart TD
@@ -224,7 +248,10 @@ bin\query-lakehouse.cmd
 
 Los lotes 2 y 3 ejercitan updates, deletes, duplicados y eventos fuera de orden (ver `data/samples/README.md`).
 
-### Power BI
+## Reporte de Power BI
+
+![Power BI](https://img.shields.io/badge/Power%20BI-PBIP%20%2F%20TMDL-F2C811?logo=powerbi&logoColor=black)
+![Thrift](https://img.shields.io/badge/Thrift-JDBC%2FODBC%2010000-555555?logo=apache&logoColor=white)
 
 Abrir `bi/powerbi/RetailLakehouse.pbip` y **Actualizar**. Credenciales: *Nombre de usuario y contraseña*
 con cualquier valor (el Thrift Server local no tiene autenticación; solo escucha en `127.0.0.1`).
@@ -243,19 +270,6 @@ vigencia (`__START_AT` / `__END_AT`) y su estado.
 
 ![Página Clientes del reporte RetailLakehouse](docs/images/powerbi-clientes.png)
 
-## Datasets
-
-| Capa | Dataset | Tipo | Descripción |
-|---|---|---|---|
-| bronze | `orders_web_raw`, `orders_store_raw` | streaming table | Pedidos crudos por canal (JSON / CSV) |
-| bronze | `customers_cdc_events` | streaming table | Eventos de cambio de clientes |
-| silver | `orders` | materialized view | Pedidos de todos los canales, sin duplicados |
-| silver | `customers` | materialized view | Versión vigente de cada cliente (SCD1) |
-| silver | `customers_history` | materialized view | Todas las versiones (SCD2, `__START_AT`/`__END_AT`) |
-| silver | `orders_enriched` | vista temporal | Pedidos + cliente; solo durante la ejecución |
-| gold | `sales_by_country`, `daily_sales_by_channel` | materialized view | Agregados para consumo |
-| exports | `orders_export` | sink | Pedidos nuevos en JSON |
-
 ## Limitaciones
 
 - **Parquet en lugar de un formato transaccional.** Dos flows no pueden escribir al mismo target: comparten el
@@ -269,6 +283,16 @@ vigencia (`__START_AT` / `__END_AT`) y su estado.
 - **Derby** es un metastore de desarrollo. En producción: PostgreSQL/MySQL, Unity Catalog o AWS Glue
   (ver `docs/architecture.md`).
 
+## Documentación
+
+| Documento | Contenido |
+|---|---|
+| [`docs/architecture.md`](docs/architecture.md) | Componentes, puertos, flujo de datos, modelo de Power BI y camino a producción |
+| [`docs/operations.md`](docs/operations.md) | Scripts de `bin/`, logs, consultas SQL por Thrift, Power BI y errores conocidos |
+| [`data/samples/README.md`](data/samples/README.md) | Qué ejercita cada lote de datos de ejemplo y el resultado esperado |
+
 ## Licencia
 
-[MIT](LICENSE)
+![License](https://img.shields.io/badge/Licencia-MIT-green)
+
+Distribuido bajo la licencia [MIT](LICENSE).
