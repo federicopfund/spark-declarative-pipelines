@@ -1,0 +1,87 @@
+{
+  "$comment": "Especificacion del modelo semantico CambiosClientes. La genera el agente bi-modeler a partir de brief.md; la lee bi/powerbi/tools/generate_model.py.",
+  "name": "CambiosClientes",
+  "spark_server": "127.0.0.1:10000",
+  "database": "retail",
+  "culture": "es-AR",
+  "tables": {
+    "customers": {
+      "description": "Version vigente de cada cliente, aplicando los eventos CDC (SCD tipo 1). Una fila por cliente, sin los borrados.",
+      "columns": [
+        { "name": "customer_id", "type": "int64", "summarize": "none", "format": "0" },
+        { "name": "name", "type": "string", "summarize": "none" },
+        { "name": "country", "type": "string", "summarize": "none" }
+      ],
+      "calculated": [
+        {
+          "name": "Cambió de país",
+          "expression": "IF ( CALCULATE ( DISTINCTCOUNT ( customers_history[country] ) ) > 1, \"Sí\", \"No\" )",
+          "description": "Sí si el cliente pasó por más de un país en su historia."
+        }
+      ],
+      "measures": [
+        {
+          "name": "Clientes actuales",
+          "expression": "COUNTROWS ( customers )",
+          "format": "#,0",
+          "description": "Clientes vigentes (una fila por cliente, sin los borrados)."
+        }
+      ]
+    },
+    "customers_history": {
+      "description": "Historial de versiones de cada cliente (SCD tipo 2). __END_AT vacio = version vigente.",
+      "columns": [
+        { "name": "customer_id", "type": "int64", "summarize": "none", "format": "0" },
+        { "name": "name", "type": "string", "summarize": "none" },
+        { "name": "email", "type": "string", "summarize": "none" },
+        { "name": "country", "type": "string", "summarize": "none" },
+        { "name": "version", "type": "int64", "summarize": "none", "format": "0" },
+        { "name": "event_ts", "type": "dateTime", "summarize": "none", "format": "dd/mm/yyyy hh:nn" },
+        { "name": "__START_AT", "type": "int64", "summarize": "none", "format": "0" },
+        { "name": "__END_AT", "type": "int64", "summarize": "none", "format": "0" }
+      ],
+      "calculated": [
+        {
+          "name": "Estado",
+          "expression": "IF ( ISBLANK ( customers_history[__END_AT] ), \"Vigente\", \"Histórica\" )",
+          "description": "Vigente si la version no fue reemplazada (__END_AT vacio); Histórica si no."
+        }
+      ],
+      "measures": [
+        {
+          "name": "Versiones",
+          "expression": "COUNTROWS ( customers_history )",
+          "format": "#,0",
+          "description": "Cantidad de versiones registradas."
+        },
+        {
+          "name": "Cambios registrados",
+          "expression": "[Versiones] - DISTINCTCOUNT ( customers_history[customer_id] )",
+          "format": "#,0",
+          "description": "Versiones posteriores a la primera de cada cliente."
+        },
+        {
+          "name": "Clientes con cambios",
+          "expression": "COUNTROWS ( FILTER ( VALUES ( customers_history[customer_id] ), CALCULATE ( COUNTROWS ( customers_history ) ) > 1 ) )",
+          "format": "#,0",
+          "description": "Clientes con mas de una version registrada."
+        },
+        {
+          "name": "Países registrados",
+          "expression": "DISTINCTCOUNT ( customers_history[country] )",
+          "format": "#,0",
+          "description": "Cantidad de paises distintos por los que paso el cliente."
+        },
+        {
+          "name": "Clientes que cambiaron de país",
+          "expression": "COUNTROWS ( FILTER ( VALUES ( customers_history[customer_id] ), [Países registrados] > 1 ) )",
+          "format": "#,0",
+          "description": "Clientes que pasaron por mas de un pais distinto en su historia."
+        }
+      ]
+    }
+  },
+  "relationships": [
+    { "from": "customers_history.customer_id", "to": "customers.customer_id" }
+  ]
+}

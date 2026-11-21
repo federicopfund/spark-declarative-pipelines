@@ -278,6 +278,7 @@ vigencia (`__START_AT` / `__END_AT`) y su estado.
 | [`docs/architecture.md`](docs/architecture.md) | Componentes, puertos, flujo de datos, modelo de Power BI y camino a producción |
 | [`docs/operations.md`](docs/operations.md) | Scripts de `bin/`, logs, consultas SQL por Thrift, Power BI y errores conocidos |
 | [`data/samples/README.md`](data/samples/README.md) | Qué ejercita cada lote de datos de ejemplo y el resultado esperado |
+| [`bi/specs/README.md`](bi/specs/README.md) | Equipo de agentes de BI (`/build-report`): requerimientos, modelado, diseño, construcción y QA de reportes |
 
 ## Licencia
 

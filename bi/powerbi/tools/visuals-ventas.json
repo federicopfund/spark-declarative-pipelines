@@ -1,0 +1,96 @@
+[
+  {
+    "visual_type": "card",
+    "name": "card_ventas",
+    "x": 20,
+    "y": 150,
+    "width": 290,
+    "height": 100,
+    "title": "Ventas totales",
+    "fields": {
+      "Values": "orders.Ventas totales"
+    }
+  },
+  {
+    "visual_type": "card",
+    "name": "card_pedidos",
+    "x": 330,
+    "y": 150,
+    "width": 290,
+    "height": 100,
+    "title": "Pedidos",
+    "fields": {
+      "Values": "orders.Pedidos"
+    }
+  },
+  {
+    "visual_type": "card",
+    "name": "card_clientes",
+    "x": 640,
+    "y": 150,
+    "width": 290,
+    "height": 100,
+    "title": "Clientes con compras",
+    "fields": {
+      "Values": "orders.Clientes con compras"
+    }
+  },
+  {
+    "visual_type": "card",
+    "name": "card_ticket",
+    "x": 950,
+    "y": 150,
+    "width": 310,
+    "height": 100,
+    "title": "Ticket promedio",
+    "fields": {
+      "Values": "orders.Ticket promedio"
+    }
+  },
+  {
+    "visual_type": "clusteredBarChart",
+    "name": "bar_pais",
+    "x": 20,
+    "y": 270,
+    "width": 610,
+    "height": 210,
+    "title": "Ventas por pa\u00eds (gold)",
+    "fields": {
+      "Category": "sales_by_country.country",
+      "Y": "sales_by_country.Ventas por pa\u00eds"
+    }
+  },
+  {
+    "visual_type": "lineChart",
+    "name": "line_diaria",
+    "x": 650,
+    "y": 270,
+    "width": 610,
+    "height": 210,
+    "title": "Ventas diarias por canal (gold)",
+    "fields": {
+      "Category": "daily_sales_by_channel.order_date",
+      "Y": "daily_sales_by_channel.Ventas diarias",
+      "Series": "daily_sales_by_channel.channel"
+    }
+  },
+  {
+    "visual_type": "tableEx",
+    "name": "tabla_pedidos",
+    "x": 20,
+    "y": 500,
+    "width": 1240,
+    "height": 200,
+    "title": "Pedidos (silver)",
+    "fields": {
+      "Values": [
+        "orders.order_id",
+        "orders.order_ts",
+        "orders.channel",
+        "customers.name",
+        "customers.country",
+        "orders.amount"
+      ]
+    }
+  }
+]

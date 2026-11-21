@@ -1,0 +1,117 @@
+/// Historial de versiones de cada cliente (SCD tipo 2). __END_AT vacio = version vigente.
+table customers_history
+	lineageTag: a36db795-55ed-534f-9cd7-61a5d701ea8f
+
+	/// Cantidad de versiones registradas.
+	measure Versiones = COUNTROWS ( customers_history )
+		formatString: #,0
+		lineageTag: 8bb0dced-cba0-5228-b46b-560eb8f913ce
+
+	/// Versiones posteriores a la primera de cada cliente.
+	measure 'Cambios registrados' = [Versiones] - DISTINCTCOUNT ( customers_history[customer_id] )
+		formatString: #,0
+		lineageTag: 7cc23264-e777-5ec9-b407-f77d67b403be
+
+	/// Clientes con mas de una version registrada.
+	measure 'Clientes con cambios' = COUNTROWS ( FILTER ( VALUES ( customers_history[customer_id] ), CALCULATE ( COUNTROWS ( customers_history ) ) > 1 ) )
+		formatString: #,0
+		lineageTag: 1ced11bc-b5a8-5e8a-bbdd-bb9102fbf06a
+
+	/// Cantidad de paises distintos por los que paso el cliente.
+	measure 'Países registrados' = DISTINCTCOUNT ( customers_history[country] )
+		formatString: #,0
+		lineageTag: d6c292aa-8c03-5382-a092-8dae0c24f0cd
+
+	/// Clientes que pasaron por mas de un pais distinto en su historia.
+	measure 'Clientes que cambiaron de país' = COUNTROWS ( FILTER ( VALUES ( customers_history[customer_id] ), [Países registrados] > 1 ) )
+		formatString: #,0
+		lineageTag: 4ca88095-7e10-5779-98bb-9853305295b5
+
+	column customer_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 7a764b09-b4f2-58ea-8373-c5af8da2a4e0
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column name
+		dataType: string
+		lineageTag: 532832ce-ba56-5285-b785-d74f7abd179f
+		summarizeBy: none
+		sourceColumn: name
+
+		annotation SummarizationSetBy = Automatic
+
+	column email
+		dataType: string
+		lineageTag: 913f4c37-c562-5c6b-b137-8dc6d39d27cb
+		summarizeBy: none
+		sourceColumn: email
+
+		annotation SummarizationSetBy = Automatic
+
+	column country
+		dataType: string
+		lineageTag: c26894a5-36ea-5b01-8555-1d57b9ea9f7c
+		summarizeBy: none
+		sourceColumn: country
+
+		annotation SummarizationSetBy = Automatic
+
+	column version
+		dataType: int64
+		formatString: 0
+		lineageTag: 280c2b7c-f36e-5f07-8e8b-a98d486886c8
+		summarizeBy: none
+		sourceColumn: version
+
+		annotation SummarizationSetBy = Automatic
+
+	column event_ts
+		dataType: dateTime
+		formatString: dd/mm/yyyy hh:nn
+		lineageTag: 0c66dad1-c4e0-5507-aa2e-ba07ee919216
+		summarizeBy: none
+		sourceColumn: event_ts
+
+		annotation SummarizationSetBy = Automatic
+
+	column __START_AT
+		dataType: int64
+		formatString: 0
+		lineageTag: 1751d608-653c-5fb1-aa99-aa8330fd4d1b
+		summarizeBy: none
+		sourceColumn: __START_AT
+
+		annotation SummarizationSetBy = Automatic
+
+	column __END_AT
+		dataType: int64
+		formatString: 0
+		lineageTag: 7e506457-722f-57d0-b9b9-14d141295fd7
+		summarizeBy: none
+		sourceColumn: __END_AT
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Vigente si la version no fue reemplazada (__END_AT vacio); Histórica si no.
+	column Estado = IF ( ISBLANK ( customers_history[__END_AT] ), "Vigente", "Histórica" )
+		dataType: string
+		lineageTag: 2f7c5e6d-7c6b-55b0-8183-16375b3fd703
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition customers_history = m
+		mode: import
+		source =
+				let
+				    Source = ApacheSpark.Tables(SparkServer, 0, [BatchSize = null]),
+				    Data = Source{[Schema = "retail", Item = "customers_history"]}[Data],
+				    Typed = Table.TransformColumnTypes(Data, {{"customer_id", Int64.Type}, {"name", type text}, {"email", type text}, {"country", type text}, {"version", Int64.Type}, {"event_ts", type datetime}, {"__START_AT", Int64.Type}, {"__END_AT", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

@@ -20,7 +20,7 @@ data/export/
 pipelines/**/spark-pipeline.local.yml
 
 # ---- Binarios de terceros (se descargan con bin\setup-dependencies) ----
-tools/
+/tools/
 jars/*.jar
 jars/disabled/*.jar
 

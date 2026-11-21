@@ -1,0 +1,18 @@
+[
+  {"visual_type": "card", "name": "card_actuales", "x": 20, "y": 150, "width": 400, "height": 100,
+   "title": "Clientes actuales", "fields": {"Values": "customers.Clientes actuales"}},
+  {"visual_type": "card", "name": "card_versiones", "x": 440, "y": 150, "width": 400, "height": 100,
+   "title": "Versiones (SCD2)", "fields": {"Values": "customers_history.Versiones"}},
+  {"visual_type": "card", "name": "card_cambios", "x": 860, "y": 150, "width": 400, "height": 100,
+   "title": "Cambios registrados", "fields": {"Values": "customers_history.Cambios registrados"}},
+  {"visual_type": "tableEx", "name": "tabla_clientes", "x": 20, "y": 270, "width": 600, "height": 430,
+   "title": "Clientes vigentes (SCD1)",
+   "fields": {"Values": ["customers.customer_id", "customers.name", "customers.email",
+                         "customers.country", "customers.version"]}},
+  {"visual_type": "tableEx", "name": "tabla_historial", "x": 640, "y": 270, "width": 620, "height": 430,
+   "title": "Historial de versiones (SCD2)",
+   "fields": {"Values": ["customers_history.customer_id", "customers_history.name",
+                         "customers_history.country", "customers_history.version",
+                         "customers_history.__START_AT", "customers_history.__END_AT",
+                         "customers_history.Estado"]}}
+]

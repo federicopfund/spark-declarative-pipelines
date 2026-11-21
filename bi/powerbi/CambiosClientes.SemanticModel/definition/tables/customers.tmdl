@@ -1,0 +1,53 @@
+/// Version vigente de cada cliente, aplicando los eventos CDC (SCD tipo 1). Una fila por cliente, sin los borrados.
+table customers
+	lineageTag: 53ae6249-460f-5e12-bf70-8233b517a54e
+
+	/// Clientes vigentes (una fila por cliente, sin los borrados).
+	measure 'Clientes actuales' = COUNTROWS ( customers )
+		formatString: #,0
+		lineageTag: 2292b9c7-2b0f-5974-b061-c284d425ab23
+
+	column customer_id
+		dataType: int64
+		formatString: 0
+		lineageTag: e2eed3b5-f6f8-5fe7-8079-50a2b28d3c09
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column name
+		dataType: string
+		lineageTag: c583f959-b062-5dfd-b527-0624fdab11eb
+		summarizeBy: none
+		sourceColumn: name
+
+		annotation SummarizationSetBy = Automatic
+
+	column country
+		dataType: string
+		lineageTag: 87ba2802-0e8e-5463-8e0c-3f8491066212
+		summarizeBy: none
+		sourceColumn: country
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Sí si el cliente pasó por más de un país en su historia.
+	column 'Cambió de país' = IF ( CALCULATE ( DISTINCTCOUNT ( customers_history[country] ) ) > 1, "Sí", "No" )
+		dataType: string
+		lineageTag: 3a011869-1604-5e60-a192-34fed50cc732
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition customers = m
+		mode: import
+		source =
+				let
+				    Source = ApacheSpark.Tables(SparkServer, 0, [BatchSize = null]),
+				    Data = Source{[Schema = "retail", Item = "customers"]}[Data],
+				    Typed = Table.TransformColumnTypes(Data, {{"customer_id", Int64.Type}, {"name", type text}, {"country", type text}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

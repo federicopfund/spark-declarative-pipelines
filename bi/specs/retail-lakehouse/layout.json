@@ -1,0 +1,187 @@
+{
+  "report": "RetailLakehouse",
+  "model": "RetailLakehouse",
+  "pages": [
+    {
+      "name": "Ventas",
+      "visuals": [
+        {
+          "visual_type": "card",
+          "name": "card_ventas",
+          "x": 20,
+          "y": 90,
+          "width": 290,
+          "height": 140,
+          "title": "Ventas totales",
+          "fields": {
+            "Values": "orders.Ventas totales"
+          }
+        },
+        {
+          "visual_type": "card",
+          "name": "card_pedidos",
+          "x": 330,
+          "y": 90,
+          "width": 290,
+          "height": 140,
+          "title": "Pedidos",
+          "fields": {
+            "Values": "orders.Pedidos"
+          }
+        },
+        {
+          "visual_type": "card",
+          "name": "card_clientes",
+          "x": 640,
+          "y": 90,
+          "width": 290,
+          "height": 140,
+          "title": "Clientes con compras",
+          "fields": {
+            "Values": "orders.Clientes con compras"
+          }
+        },
+        {
+          "visual_type": "card",
+          "name": "card_ticket",
+          "x": 950,
+          "y": 90,
+          "width": 310,
+          "height": 140,
+          "title": "Ticket promedio",
+          "fields": {
+            "Values": "orders.Ticket promedio"
+          }
+        },
+        {
+          "visual_type": "clusteredBarChart",
+          "name": "bar_pais",
+          "x": 20,
+          "y": 245,
+          "width": 610,
+          "height": 250,
+          "title": "Ventas por país (gold)",
+          "fields": {
+            "Category": "sales_by_country.country",
+            "Y": "sales_by_country.Ventas por país"
+          }
+        },
+        {
+          "visual_type": "lineChart",
+          "name": "line_diaria",
+          "x": 650,
+          "y": 245,
+          "width": 610,
+          "height": 250,
+          "title": "Ventas diarias por canal (gold)",
+          "fields": {
+            "Category": "daily_sales_by_channel.order_date",
+            "Y": "daily_sales_by_channel.Ventas diarias",
+            "Series": "daily_sales_by_channel.channel"
+          },
+          "properties": {
+            "categoryAxis.axisType": "Categorical"
+          }
+        },
+        {
+          "visual_type": "tableEx",
+          "name": "tabla_pedidos",
+          "x": 20,
+          "y": 510,
+          "width": 1240,
+          "height": 200,
+          "title": "Pedidos (silver)",
+          "fields": {
+            "Values": [
+              "orders.order_id",
+              "orders.order_ts",
+              "orders.channel",
+              "customers.name",
+              "customers.country",
+              "orders.amount"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clientes",
+      "visuals": [
+        {
+          "visual_type": "card",
+          "name": "card_actuales",
+          "x": 20,
+          "y": 90,
+          "width": 400,
+          "height": 140,
+          "title": "Clientes actuales",
+          "fields": {
+            "Values": "customers.Clientes actuales"
+          }
+        },
+        {
+          "visual_type": "card",
+          "name": "card_versiones",
+          "x": 440,
+          "y": 90,
+          "width": 400,
+          "height": 140,
+          "title": "Versiones (SCD2)",
+          "fields": {
+            "Values": "customers_history.Versiones"
+          }
+        },
+        {
+          "visual_type": "card",
+          "name": "card_cambios",
+          "x": 860,
+          "y": 90,
+          "width": 400,
+          "height": 140,
+          "title": "Cambios registrados",
+          "fields": {
+            "Values": "customers_history.Cambios registrados"
+          }
+        },
+        {
+          "visual_type": "tableEx",
+          "name": "tabla_clientes",
+          "x": 20,
+          "y": 245,
+          "width": 600,
+          "height": 465,
+          "title": "Clientes vigentes (SCD1)",
+          "fields": {
+            "Values": [
+              "customers.customer_id",
+              "customers.name",
+              "customers.email",
+              "customers.country",
+              "customers.version"
+            ]
+          }
+        },
+        {
+          "visual_type": "tableEx",
+          "name": "tabla_historial",
+          "x": 640,
+          "y": 245,
+          "width": 620,
+          "height": 465,
+          "title": "Historial de versiones (SCD2)",
+          "fields": {
+            "Values": [
+              "customers_history.customer_id",
+              "customers_history.name",
+              "customers_history.country",
+              "customers_history.version",
+              "customers_history.__START_AT",
+              "customers_history.__END_AT",
+              "customers_history.Estado"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
