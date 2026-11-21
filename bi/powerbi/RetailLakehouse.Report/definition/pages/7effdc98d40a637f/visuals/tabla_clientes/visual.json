@@ -3,10 +3,10 @@
   "name": "tabla_clientes",
   "position": {
     "x": 20,
-    "y": 305,
-    "z": 0,
-    "height": 395,
+    "y": 245,
     "width": 600,
+    "height": 465,
+    "z": 0,
     "tabOrder": 0
   },
   "visual": {

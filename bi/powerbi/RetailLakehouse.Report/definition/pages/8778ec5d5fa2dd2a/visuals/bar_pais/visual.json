@@ -3,10 +3,10 @@
   "name": "bar_pais",
   "position": {
     "x": 20,
-    "y": 300,
-    "z": 0,
-    "height": 190,
+    "y": 245,
     "width": 610,
+    "height": 250,
+    "z": 0,
     "tabOrder": 0
   },
   "visual": {

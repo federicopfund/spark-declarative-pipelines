@@ -3,10 +3,10 @@
   "name": "line_diaria",
   "position": {
     "x": 650,
-    "y": 300,
-    "z": 0,
-    "height": 190,
+    "y": 245,
     "width": 610,
+    "height": 250,
+    "z": 0,
     "tabOrder": 0
   },
   "visual": {
@@ -123,6 +123,21 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "categoryAxis": [
+        {
+          "properties": {
+            "axisType": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Categorical'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
   }
 }

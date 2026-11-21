@@ -3,10 +3,10 @@
   "name": "card_cambios",
   "position": {
     "x": 860,
-    "y": 150,
-    "z": 0,
-    "height": 140,
+    "y": 90,
     "width": 400,
+    "height": 140,
+    "z": 0,
     "tabOrder": 0
   },
   "visual": {
