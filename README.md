@@ -201,6 +201,19 @@ Abrir `bi/powerbi/RetailLakehouse.pbip` y **Actualizar**. Credenciales: *Nombre 
 con cualquier valor (el Thrift Server local no tiene autenticación; solo escucha en `127.0.0.1`).
 Ver `docs/operations.md`.
 
+El reporte `RetailLakehouse` importa las tablas silver y gold por el Thrift Server
+(conector Spark, protocolo Standard) y tiene dos páginas:
+
+**Ventas**: indicadores de ventas, pedidos, clientes y ticket promedio; ventas por país y por día y canal
+(capa gold) y el detalle de pedidos (capa silver).
+
+![Página Ventas del reporte RetailLakehouse](docs/images/powerbi-ventas.png)
+
+**Clientes**: resultado del CDC. Clientes vigentes (SCD1) e historial completo de versiones (SCD2) con su
+vigencia (`__START_AT` / `__END_AT`) y su estado.
+
+![Página Clientes del reporte RetailLakehouse](docs/images/powerbi-clientes.png)
+
 ## Datasets
 
 | Capa | Dataset | Tipo | Descripción |
