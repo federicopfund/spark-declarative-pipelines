@@ -1,3 +1,32 @@
+<!-- Procesamiento -->
+![Apache Spark](https://img.shields.io/badge/Apache%20Spark-4.3.0-E25A1C?logo=apachespark&logoColor=white)
+![Spark Declarative Pipelines](https://img.shields.io/badge/Spark-Declarative%20Pipelines-E25A1C?logo=apachespark&logoColor=white)
+![PySpark](https://img.shields.io/badge/PySpark-4.3-E25A1C?logo=apachespark&logoColor=white)
+![Spark Connect](https://img.shields.io/badge/Spark%20Connect-gRPC%2015002-244c5a?logo=grpc&logoColor=white)
+![Thrift](https://img.shields.io/badge/Thrift-JDBC%2FODBC%2010000-555555?logo=apache&logoColor=white)
+
+<!-- Almacenamiento y catálogo -->
+![Parquet](https://img.shields.io/badge/Apache%20Parquet-tables-50ABF1?logo=apacheparquet&logoColor=white)
+![Hive Metastore](https://img.shields.io/badge/Hive%20Metastore-Derby-FDEE21?logo=apachehive&logoColor=black)
+
+<!-- BI -->
+![Power BI](https://img.shields.io/badge/Power%20BI-PBIP%20%2F%20TMDL-F2C811?logo=powerbi&logoColor=black)
+
+<!-- Runtime -->
+![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
+![Java](https://img.shields.io/badge/Java-17-ED8B00?logo=openjdk&logoColor=white)
+![PowerShell](https://img.shields.io/badge/PowerShell-5.1-5391FE?logo=powershell&logoColor=white)
+![Windows](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6?logo=windows&logoColor=white)
+
+<!-- Arquitectura -->
+![Medallion](https://img.shields.io/badge/Arquitectura-Medallion%20(bronze%2Fsilver%2Fgold)-8B5A2B)
+![CDC](https://img.shields.io/badge/CDC-SCD1%20%7C%20SCD2-6A5ACD)
+![Mermaid](https://img.shields.io/badge/Diagramas-Mermaid-FF3670?logo=mermaid&logoColor=white)
+
+<!-- Proyecto -->
+![License](https://img.shields.io/badge/Licencia-MIT-green)
+
+
 # Retail Lakehouse · Spark Declarative Pipelines
 
 Lakehouse de ejemplo con arquitectura medallón (bronze → silver → gold) construido con
