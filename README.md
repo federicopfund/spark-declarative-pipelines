@@ -113,13 +113,13 @@ flowchart LR
         ORD["orders<br/><i>unión + dedup por order_id</i>"]
         CUS["customers<br/><i>SCD tipo 1</i>"]
         HIS["customers_history<br/><i>SCD tipo 2</i>"]
-        ENR(["orders_enriched<br/><i>vista temporal</i>"])
     end
 
-    subgraph GOLD["🥇 Gold"]
+    subgraph GOLD["🥇 Gold · estrella"]
         direction TB
-        SBC["sales_by_country"]
-        DSC["daily_sales_by_channel"]
+        DIM["dim_customer · dim_date<br/>dim_channel"]
+        FCT["fact_orders<br/>fact_customer_changes"]
+        AGG["agg_sales_by_country<br/>agg_daily_sales_by_channel"]
     end
 
     EXP[["orders_export<br/><i>sink JSON → data/export</i>"]]
@@ -137,23 +137,23 @@ flowchart LR
     OWR --> EXP
     OSR --> EXP
 
-    ORD --> ENR
-    CUS --> ENR
-    ENR --> SBC
-    ENR --> DSC
+    HIS --> DIM
+    ORD --> FCT
+    DIM --> FCT
+    FCT --> AGG
 
-    ORD -. "Thrift / ODBC" .-> PBI
-    CUS -.-> PBI
-    HIS -.-> PBI
-    SBC -.-> PBI
-    DSC -.-> PBI
+    FCT -. "Thrift / ODBC" .-> PBI
+    DIM -.-> PBI
+    AGG -.-> PBI
 ```
 
 - **Landing** recibe archivos por lote (JSON y CSV), simulando lo que llega de los sistemas de origen.
 - **Bronze** (streaming tables) lee de forma incremental solo los archivos nuevos de cada carpeta (checkpoints en `storage/`).
 - **Silver** une los canales sin duplicados y aplica los eventos de cambio de clientes: versión vigente (SCD1)
   e historial completo con `__START_AT` / `__END_AT` (SCD2).
-- **Gold** (materialized views) agrega sobre `orders_enriched` (pedidos + país actual del cliente), una vista que solo existe durante la ejecución.
+- **Gold** es un **modelo en estrella** (Kimball): dimensiones (`dim_*`), hechos (`fact_*`) y agregados (`agg_*`)
+  calculados desde los hechos. Cada pedido se une a la versión del cliente **vigente al momento de la compra**.
+  Ver [`docs/data-model.md`](docs/data-model.md).
 - **Exports** publica los pedidos nuevos fuera del pipeline, en un único flow para los dos canales.
 - **Power BI** importa silver y gold por el Thrift JDBC/ODBC Server.
 
@@ -169,8 +169,11 @@ flowchart LR
 | silver | `orders` | materialized view | Pedidos de todos los canales, sin duplicados |
 | silver | `customers` | materialized view | Versión vigente de cada cliente (SCD1) |
 | silver | `customers_history` | materialized view | Todas las versiones (SCD2, `__START_AT`/`__END_AT`) |
-| silver | `orders_enriched` | vista temporal | Pedidos + cliente; solo durante la ejecución |
-| gold | `sales_by_country`, `daily_sales_by_channel` | materialized view | Agregados para consumo |
+| gold · dimensión | `dim_customer` | materialized view | Versiones de cada cliente (SCD2 con vigencia por fecha) |
+| gold · dimensión | `dim_date`, `dim_channel` | materialized view | Calendario y canales de venta |
+| gold · hecho | `fact_orders` | materialized view | Un pedido, unido a la versión del cliente vigente al comprar |
+| gold · hecho | `fact_customer_changes` | materialized view | Un cambio de versión de un cliente y qué atributos cambiaron |
+| gold · agregado | `agg_sales_by_country`, `agg_daily_sales_by_channel` | materialized view | Agregados calculados desde `fact_orders` |
 | exports | `orders_export` | sink | Pedidos nuevos en JSON |
 
 ## Estructura del repositorio
@@ -178,13 +181,16 @@ flowchart LR
 ```
 ├── pipelines/retail_lakehouse/      Pipeline SDP
 │   ├── spark-pipeline.yml           Spec (plantilla: ${PROJECT_ROOT_URI} se resuelve al correr)
-│   └── transformations/
-│       ├── bronze/                  Ingesta incremental desde data/landing
-│       ├── silver/                  Pedidos unificados, clientes SCD1 y SCD2
-│       ├── gold/                    Ventas por país y por día/canal
-│       └── exports/                 Sink de pedidos nuevos (JSON)
-├── src/retail_lakehouse/            Librería compartida (esquemas, lógica CDC)
-├── clients/                         Clientes Spark Connect (bootstrap del catálogo, consultas)
+│   ├── transformations/
+│   │   ├── bronze/                  Ingesta incremental desde data/landing
+│   │   ├── silver/                  Pedidos unificados, clientes SCD1 y SCD2
+│   │   ├── gold/                    Modelo en estrella
+│   │   │   ├── sql/                 dimensions/ · facts/ · aggregates/
+│   │   │   └── python/              dimensions/ · facts/
+│   │   └── exports/                 Sink de pedidos nuevos (JSON)
+│   └── quality/                     Controles de calidad (un .sql por regla)
+├── src/retail_lakehouse/            Librería compartida (esquemas, CDC, claves del modelo en gold/)
+├── clients/                         Clientes Spark Connect (catálogo, consultas, controles de calidad)
 ├── bin/                             Scripts de operación (Windows: .cmd → .ps1)
 ├── conf/                            spark-defaults, log4j2, entorno (spark-env.ps1)
 ├── bi/powerbi/                      Proyecto Power BI (PBIP) + generador del modelo
@@ -276,6 +282,7 @@ vigencia (`__START_AT` / `__END_AT`) y su estado.
 | Documento | Contenido |
 |---|---|
 | [`docs/architecture.md`](docs/architecture.md) | Componentes, puertos, flujo de datos, modelo de Power BI y camino a producción |
+| [`docs/data-model.md`](docs/data-model.md) | Modelo dimensional: esquema en estrella, matriz de bus, granos, convenciones y controles de calidad |
 | [`docs/operations.md`](docs/operations.md) | Scripts de `bin/`, logs, consultas SQL por Thrift, Power BI y errores conocidos |
 | [`data/samples/README.md`](data/samples/README.md) | Qué ejercita cada lote de datos de ejemplo y el resultado esperado |
 | [`bi/specs/README.md`](bi/specs/README.md) | Equipo de agentes de BI (`/build-report`): requerimientos, modelado, diseño, construcción y QA de reportes |

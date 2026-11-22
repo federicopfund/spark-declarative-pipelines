@@ -1,0 +1,92 @@
+/// Pedidos (gold.fact_orders). Grano: un pedido, con el cliente vigente al momento de la compra.
+table fact_orders
+	lineageTag: 160a6633-26e1-5f3a-a5ad-906b1eebb770
+
+	/// Importe de los pedidos.
+	measure 'Importe vendido' = SUM ( fact_orders[amount] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: Modelo estrella
+		lineageTag: db95ae0e-d408-5751-b292-506c1600e54b
+
+	/// Pedidos.
+	measure 'Cantidad de pedidos' = COUNTROWS ( fact_orders )
+		formatString: #,0
+		displayFolder: Modelo estrella
+		lineageTag: 457bb069-cee5-538e-9407-0a2974cc4af2
+
+	/// Clientes distintos con pedidos en el contexto (filtra por la relacion con fact_orders).
+	measure 'Clientes compradores' = DISTINCTCOUNT ( dim_customer[customer_id] )
+		formatString: #,0
+		displayFolder: Modelo estrella
+		lineageTag: 056b8c87-d36c-5c18-872c-1d83020fc873
+
+	/// Importe promedio por pedido.
+	measure 'Importe promedio' = DIVIDE ( [Importe vendido], [Cantidad de pedidos] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: Modelo estrella
+		lineageTag: 9a5ce3c9-a74e-5212-ace1-cea588148e4f
+
+	column order_id
+		dataType: string
+		lineageTag: 30c18613-979a-5710-bbcb-3ea40e4c01d0
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_key
+		dataType: int64
+		isHidden
+		lineageTag: c7c3c403-9ef4-5f22-aeb0-efbcb84b87d5
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_sk
+		dataType: int64
+		isHidden
+		lineageTag: 6cfaad63-4c68-58ab-87b2-e2fb7b216996
+		summarizeBy: none
+		sourceColumn: customer_sk
+
+		annotation SummarizationSetBy = Automatic
+
+	column channel_key
+		dataType: int64
+		isHidden
+		lineageTag: 8c559916-0619-50da-ac48-36c918f8ebe3
+		summarizeBy: none
+		sourceColumn: channel_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column amount
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: a336d321-2a37-5963-82e7-89dfd1fb5834
+		summarizeBy: sum
+		sourceColumn: amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_ts
+		dataType: dateTime
+		formatString: dd/mm/yyyy hh:nn
+		lineageTag: 2f734681-d34c-5c14-82a0-e257f8e2b923
+		summarizeBy: none
+		sourceColumn: order_ts
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_orders = m
+		mode: import
+		source =
+				let
+				    Source = ApacheSpark.Tables(SparkServer, 0, [BatchSize = null]),
+				    Data = Source{[Schema = "retail", Item = "fact_orders"]}[Data],
+				    Typed = Table.TransformColumnTypes(Data, {{"order_id", type text}, {"date_key", Int64.Type}, {"customer_sk", Int64.Type}, {"channel_key", Int64.Type}, {"amount", Currency.Type}, {"order_ts", type datetime}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

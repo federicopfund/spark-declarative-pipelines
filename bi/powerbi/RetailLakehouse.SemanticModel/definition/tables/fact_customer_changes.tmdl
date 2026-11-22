@@ -1,0 +1,145 @@
+/// Cambios de clientes (gold.fact_customer_changes). Grano: un cambio de version.
+table fact_customer_changes
+	lineageTag: e1ca2cf3-6354-571e-aa40-20cbe7bbcf10
+
+	/// Cambios de version.
+	measure Cambios = COUNTROWS ( fact_customer_changes )
+		formatString: #,0
+		displayFolder: Modelo estrella
+		lineageTag: b38e08a9-150f-5dfa-8c26-7c994c7b9bda
+
+	/// Cambios en los que cambio el pais.
+	measure 'Cambios de país' = CALCULATE ( [Cambios], fact_customer_changes[country_changed] = TRUE () )
+		formatString: #,0
+		displayFolder: Modelo estrella
+		lineageTag: e7242909-a568-5e27-9306-9fa582cc59ef
+
+	/// Cambios en los que cambio el email.
+	measure 'Cambios de email' = CALCULATE ( [Cambios], fact_customer_changes[email_changed] = TRUE () )
+		formatString: #,0
+		displayFolder: Modelo estrella
+		lineageTag: 32c12f5b-b8a1-5733-8a64-f018ea6cb9da
+
+	column change_sk
+		dataType: int64
+		isHidden
+		lineageTag: 4389338d-540b-5073-8687-eb401a089ee6
+		summarizeBy: none
+		sourceColumn: change_sk
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_key
+		dataType: int64
+		isHidden
+		lineageTag: 1b43a8ff-e1b3-57b7-a97b-555ff8b76951
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_sk
+		dataType: int64
+		isHidden
+		lineageTag: 66c77fe0-7459-5152-8ffb-a597aafdd15d
+		summarizeBy: none
+		sourceColumn: customer_sk
+
+		annotation SummarizationSetBy = Automatic
+
+	column previous_customer_sk
+		dataType: int64
+		isHidden
+		lineageTag: c2fa96a0-df71-5ff3-89fa-a7284a6cc659
+		summarizeBy: none
+		sourceColumn: previous_customer_sk
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_id
+		dataType: int64
+		formatString: 0
+		lineageTag: a1752616-4836-50b1-aca3-3b7c3a5b3a19
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column from_version
+		dataType: int64
+		formatString: 0
+		lineageTag: 59dce0fe-c569-5c86-9cb6-b7c313f67b7e
+		summarizeBy: none
+		sourceColumn: from_version
+
+		annotation SummarizationSetBy = Automatic
+
+	column to_version
+		dataType: int64
+		formatString: 0
+		lineageTag: d9562f1b-c6a9-5e6f-baae-d387d0061b30
+		summarizeBy: none
+		sourceColumn: to_version
+
+		annotation SummarizationSetBy = Automatic
+
+	column from_country
+		dataType: string
+		lineageTag: c20f0e21-a673-586c-a529-e9f8252e548e
+		summarizeBy: none
+		sourceColumn: from_country
+
+		annotation SummarizationSetBy = Automatic
+
+	column to_country
+		dataType: string
+		lineageTag: ab1db2d4-865c-5df4-911b-60e67c24a5b1
+		summarizeBy: none
+		sourceColumn: to_country
+
+		annotation SummarizationSetBy = Automatic
+
+	column country_changed
+		dataType: boolean
+		lineageTag: 0a8ce08b-ddf2-51dd-8cc7-f1082921da19
+		summarizeBy: none
+		sourceColumn: country_changed
+
+		annotation SummarizationSetBy = Automatic
+
+	column email_changed
+		dataType: boolean
+		lineageTag: 43a73ccc-02c0-5a99-ad24-b292ab3caf13
+		summarizeBy: none
+		sourceColumn: email_changed
+
+		annotation SummarizationSetBy = Automatic
+
+	column name_changed
+		dataType: boolean
+		lineageTag: 81d7f350-e373-581a-beff-09a2682d89ab
+		summarizeBy: none
+		sourceColumn: name_changed
+
+		annotation SummarizationSetBy = Automatic
+
+	column changed_at
+		dataType: dateTime
+		formatString: dd/mm/yyyy hh:nn
+		lineageTag: 422a2c9c-683f-5036-b099-b8b4768b4f40
+		summarizeBy: none
+		sourceColumn: changed_at
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_customer_changes = m
+		mode: import
+		source =
+				let
+				    Source = ApacheSpark.Tables(SparkServer, 0, [BatchSize = null]),
+				    Data = Source{[Schema = "retail", Item = "fact_customer_changes"]}[Data],
+				    Typed = Table.TransformColumnTypes(Data, {{"change_sk", Int64.Type}, {"date_key", Int64.Type}, {"customer_sk", Int64.Type}, {"previous_customer_sk", Int64.Type}, {"customer_id", Int64.Type}, {"from_version", Int64.Type}, {"to_version", Int64.Type}, {"from_country", type text}, {"to_country", type text}, {"country_changed", type logical}, {"email_changed", type logical}, {"name_changed", type logical}, {"changed_at", type datetime}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

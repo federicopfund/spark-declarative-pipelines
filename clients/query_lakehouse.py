@@ -14,12 +14,18 @@ import argparse
 from pyspark.sql import SparkSession
 
 DATASETS = [
+    # silver
     "customers_cdc_events",
     "customers",
     "customers_history",
     "orders",
-    "sales_by_country",
-    "daily_sales_by_channel",
+    # gold: dimensiones, hechos y agregados
+    "dim_channel",
+    "dim_customer",
+    "fact_orders",
+    "fact_customer_changes",
+    "agg_sales_by_country",
+    "agg_daily_sales_by_channel",
 ]
 
 SORT_KEYS = {
@@ -29,11 +35,16 @@ SORT_KEYS = {
     "orders": ["order_id"],
     "orders_web_raw": ["order_id"],
     "orders_store_raw": ["order_id"],
-    "sales_by_country": ["country"],
-    "daily_sales_by_channel": ["order_date", "channel"],
+    "dim_channel": ["channel_key"],
+    "dim_date": ["date_key"],
+    "dim_customer": ["customer_id", "version"],
+    "fact_orders": ["order_id"],
+    "fact_customer_changes": ["customer_id", "to_version"],
+    "agg_sales_by_country": ["country"],
+    "agg_daily_sales_by_channel": ["order_date", "channel"],
 }
 
-HIDDEN_COLUMNS = {"_ingested_at", "_source_file"}
+HIDDEN_COLUMNS = {"_ingested_at", "_source_file", "_loaded_at"}
 
 
 def main() -> None:

@@ -1,0 +1,98 @@
+/// Clientes con historial (gold.dim_customer, SCD2). Grano: una version de un cliente.
+table dim_customer
+	lineageTag: c99109fe-8807-5ae4-81d9-f828feabc47c
+
+	/// Clientes con una version vigente (excluye el miembro desconocido).
+	measure 'Clientes vigentes' = CALCULATE ( DISTINCTCOUNT ( dim_customer[customer_id] ), dim_customer[is_current] = TRUE (), dim_customer[customer_id] <> -1 )
+		formatString: #,0
+		displayFolder: Modelo estrella
+		lineageTag: 5a5424af-673b-55ba-bbcc-397b841b8c3e
+
+	column customer_sk
+		dataType: int64
+		isHidden
+		lineageTag: 778cebb4-9f05-55f0-98c8-c29afba607fb
+		summarizeBy: none
+		sourceColumn: customer_sk
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 7332623c-9bfc-5b69-8849-f694d060fa2a
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column version
+		dataType: int64
+		formatString: 0
+		lineageTag: abdd602b-66cb-5e5e-b095-0aa0d7f444a7
+		summarizeBy: none
+		sourceColumn: version
+
+		annotation SummarizationSetBy = Automatic
+
+	column name
+		dataType: string
+		lineageTag: d8a80a72-de16-5e72-b298-d1ac794fa0b5
+		summarizeBy: none
+		sourceColumn: name
+
+		annotation SummarizationSetBy = Automatic
+
+	column email
+		dataType: string
+		lineageTag: 11f70443-e721-536d-bd16-7802b7bee90c
+		summarizeBy: none
+		sourceColumn: email
+
+		annotation SummarizationSetBy = Automatic
+
+	column country
+		dataType: string
+		lineageTag: 748f98b2-2da8-57b0-801c-420a69bd843d
+		summarizeBy: none
+		sourceColumn: country
+
+		annotation SummarizationSetBy = Automatic
+
+	column valid_from
+		dataType: dateTime
+		formatString: dd/mm/yyyy hh:nn
+		lineageTag: 64a3dc34-44f1-5663-8afe-5c863bc8cb57
+		summarizeBy: none
+		sourceColumn: valid_from
+
+		annotation SummarizationSetBy = Automatic
+
+	column valid_to
+		dataType: dateTime
+		formatString: dd/mm/yyyy hh:nn
+		lineageTag: 6482b9a8-59fc-5b19-ae38-ec4dfc84c466
+		summarizeBy: none
+		sourceColumn: valid_to
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_current
+		dataType: boolean
+		lineageTag: ba6898fd-e9fb-5525-902c-e8cd7d2c69fc
+		summarizeBy: none
+		sourceColumn: is_current
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_customer = m
+		mode: import
+		source =
+				let
+				    Source = ApacheSpark.Tables(SparkServer, 0, [BatchSize = null]),
+				    Data = Source{[Schema = "retail", Item = "dim_customer"]}[Data],
+				    Typed = Table.TransformColumnTypes(Data, {{"customer_sk", Int64.Type}, {"customer_id", Int64.Type}, {"version", Int64.Type}, {"name", type text}, {"email", type text}, {"country", type text}, {"valid_from", type datetime}, {"valid_to", type datetime}, {"is_current", type logical}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

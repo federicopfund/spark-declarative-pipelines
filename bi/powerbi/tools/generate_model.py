@@ -97,13 +97,20 @@ def validate(spec: dict) -> None:
 
 def table_tmdl(name: str, t: dict, database: str) -> str:
     """Una tabla: medidas, columnas, columnas calculadas y particion M contra Spark."""
-    out = [f"/// {t['description']}", f"table {q(name)}", f"\tlineageTag: {tag('table', name)}", ""]
+    out = [f"/// {t['description']}", f"table {q(name)}"]
+    if t.get("data_category"):
+        out.append(f"\tdataCategory: {t['data_category']}")  # "Time" marca la tabla de fechas
+    out += [f"\tlineageTag: {tag('table', name)}", ""]
 
     for m in t.get("measures", []):
         out += [
             f"\t/// {m['description']}",
             f"\tmeasure {q(m['name'])} = {m['expression']}",
             f"\t\tformatString: {m['format']}",
+        ]
+        if m.get("folder"):
+            out.append(f"\t\tdisplayFolder: {m['folder']}")
+        out += [
             f"\t\tlineageTag: {tag('measure', name, m['name'])}",
             "",
         ]
@@ -111,16 +118,29 @@ def table_tmdl(name: str, t: dict, database: str) -> str:
     for c in t["columns"]:
         out.append(f"\tcolumn {q(c['name'])}")
         out.append(f"\t\tdataType: {TYPES[c['type']][0]}")
+        if c.get("hidden"):
+            out.append("\t\tisHidden")  # claves tecnicas: se usan en relaciones, no en visuales
+        if c.get("key"):
+            out.append("\t\tisKey")
         if c.get("format"):
             out.append(f"\t\tformatString: {c['format']}")
+        if c.get("folder"):
+            out.append(f"\t\tdisplayFolder: {c['folder']}")
         out += [
             f"\t\tlineageTag: {tag('column', name, c['name'])}",
             f"\t\tsummarizeBy: {c.get('summarize', 'none')}",
             f"\t\tsourceColumn: {c['name']}",
+        ]
+        if c.get("sort_by"):
+            out.append(f"\t\tsortByColumn: {q(c['sort_by'])}")  # p. ej. nombre del mes ordenado por numero
+        out += [
             "",
             "\t\tannotation SummarizationSetBy = Automatic",
             "",
         ]
+        if c["type"] == "date":
+            # Sin esta anotacion Power BI trata la columna como fecha y hora (ejes por hora, no por dia)
+            out += ["\t\tannotation UnderlyingDateTimeDataType = Date", ""]
 
     for c in t.get("calculated", []):
         out += [

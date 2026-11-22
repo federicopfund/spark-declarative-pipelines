@@ -1,4 +1,4 @@
-/// Ventas agregadas por dia y canal (capa gold).
+/// Ventas agregadas por dia y canal (gold: agg_daily_sales_by_channel).
 table daily_sales_by_channel
 	lineageTag: 3d348011-5ec2-56a0-84d9-621225934b51
 
@@ -9,7 +9,7 @@ table daily_sales_by_channel
 
 	column order_date
 		dataType: dateTime
-		formatString: Long Date
+		formatString: dd/mm/yyyy
 		lineageTag: d92dcebe-6c24-5f8a-af50-689b4547d9d2
 		summarizeBy: none
 		sourceColumn: order_date
@@ -49,10 +49,9 @@ table daily_sales_by_channel
 		source =
 				let
 				    Source = ApacheSpark.Tables(SparkServer, 0, [BatchSize = null]),
-				    Data = Source{[Schema = "retail", Item = "daily_sales_by_channel"]}[Data],
+				    Data = Source{[Schema = "retail", Item = "agg_daily_sales_by_channel"]}[Data],
 				    Typed = Table.TransformColumnTypes(Data, {{"order_date", type date}, {"channel", type text}, {"orders", Int64.Type}, {"total_amount", Currency.Type}})
 				in
 				    Typed
 
 	annotation PBI_ResultType = Table
-

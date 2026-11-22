@@ -6,3 +6,22 @@ relationship 4a681de2-cb97-5e7d-af7f-1427fff512a5
 	fromColumn: customers_history.customer_id
 	toColumn: customers.customer_id
 
+relationship b474b1fc-5bdc-5cc8-be0f-d2257fc66491
+	fromColumn: fact_orders.date_key
+	toColumn: dim_date.date_key
+
+relationship a1893d2e-b5ea-5387-828c-3c9dc75f1d4e
+	fromColumn: fact_orders.customer_sk
+	toColumn: dim_customer.customer_sk
+
+relationship f6a05b51-023c-5498-81c7-e76cb7fbb7a9
+	fromColumn: fact_orders.channel_key
+	toColumn: dim_channel.channel_key
+
+relationship c458e15d-9f08-587b-89e2-c38a404a7db4
+	fromColumn: fact_customer_changes.date_key
+	toColumn: dim_date.date_key
+
+relationship 473fd128-6a29-520d-a62b-52359bf80ffd
+	fromColumn: fact_customer_changes.customer_sk
+	toColumn: dim_customer.customer_sk

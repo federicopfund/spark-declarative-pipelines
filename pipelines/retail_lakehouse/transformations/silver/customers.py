@@ -28,7 +28,7 @@ spark: SparkSession
 )
 def customers() -> DataFrame:
     return apply_changes_scd1(
-        spark.table("customers_cdc_events"),
+        spark.table("src_customers_cdc_events"),
         keys=["customer_id"],
         sequence_by="version",
         apply_as_deletes="op = 'DELETE'",

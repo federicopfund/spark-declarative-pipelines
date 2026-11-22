@@ -1,0 +1,48 @@
+/// Canales de venta (gold.dim_channel). Grano: un canal.
+table dim_channel
+	lineageTag: b3f78336-688d-58c5-85dc-65c15f84ee23
+
+	column channel_key
+		dataType: int64
+		isHidden
+		lineageTag: 8ec4020a-f1fa-567c-b7dc-bfd41c368266
+		summarizeBy: none
+		sourceColumn: channel_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column channel_code
+		dataType: string
+		lineageTag: 43b68b9b-395f-5d0d-8331-59be1ad780cd
+		summarizeBy: none
+		sourceColumn: channel_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column channel_name
+		dataType: string
+		lineageTag: 50291880-817d-53ac-86a3-0a5e2b0ca965
+		summarizeBy: none
+		sourceColumn: channel_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column channel_type
+		dataType: string
+		lineageTag: b3e8f88d-96c5-587f-a56f-e05d0b6a9e5f
+		summarizeBy: none
+		sourceColumn: channel_type
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_channel = m
+		mode: import
+		source =
+				let
+				    Source = ApacheSpark.Tables(SparkServer, 0, [BatchSize = null]),
+				    Data = Source{[Schema = "retail", Item = "dim_channel"]}[Data],
+				    Typed = Table.TransformColumnTypes(Data, {{"channel_key", Int64.Type}, {"channel_code", type text}, {"channel_name", type text}, {"channel_type", type text}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

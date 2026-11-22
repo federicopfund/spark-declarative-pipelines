@@ -1,4 +1,4 @@
-/// Ventas agregadas por pais del cliente (capa gold).
+/// Ventas agregadas por pais del cliente (gold: agg_sales_by_country).
 table sales_by_country
 	lineageTag: 0692165d-1c37-57d7-84d0-8990d8c18fda
 
@@ -56,10 +56,9 @@ table sales_by_country
 		source =
 				let
 				    Source = ApacheSpark.Tables(SparkServer, 0, [BatchSize = null]),
-				    Data = Source{[Schema = "retail", Item = "sales_by_country"]}[Data],
+				    Data = Source{[Schema = "retail", Item = "agg_sales_by_country"]}[Data],
 				    Typed = Table.TransformColumnTypes(Data, {{"country", type text}, {"orders", Int64.Type}, {"customers", Int64.Type}, {"total_amount", Currency.Type}, {"average_order", Currency.Type}})
 				in
 				    Typed
 
 	annotation PBI_ResultType = Table
-

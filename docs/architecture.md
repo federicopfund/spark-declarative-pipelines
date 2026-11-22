@@ -54,7 +54,7 @@ flowchart LR
 |---|---|
 | Entradas | Pedidos web (JSON), pedidos de tienda (CSV), eventos CDC de clientes (JSON) |
 | Procesamiento | Spark 4.3 Standalone, pipeline declarativo ejecutado por Spark Connect |
-| Salidas | 8 tablas en el catálogo `retail`, un sink de pedidos en JSON, reporte de Power BI |
+| Salidas | 13 tablas en el catálogo `retail` (gold: modelo en estrella + agregados), un sink de pedidos en JSON, reportes de Power BI |
 | Modo | Por lotes incrementales: cada ejecución procesa solo los archivos nuevos |
 
 ## 2. Componentes en ejecución
@@ -203,13 +203,17 @@ flowchart LR
         ORD["orders"]
         CUS["customers"]
         HIS["customers_history"]
-        ENR(["orders_enriched"])
     end
 
-    subgraph GOLD["🥇 Gold"]
+    subgraph GOLD["🥇 Gold · modelo en estrella"]
         direction TB
-        SBC["sales_by_country"]
-        DSC["daily_sales_by_channel"]
+        DCH["dim_channel"]
+        DDT["dim_date"]
+        DCU["dim_customer"]
+        FOR["fact_orders"]
+        FCC["fact_customer_changes"]
+        ASC["agg_sales_by_country"]
+        ADS["agg_daily_sales_by_channel"]
     end
 
     EXP[["orders_export"]]
@@ -220,10 +224,17 @@ flowchart LR
     CCE -- "SCD2" --> HIS
     OWR --> EXP
     OSR --> EXP
-    ORD --> ENR
-    CUS --> ENR
-    ENR --> SBC
-    ENR --> DSC
+    HIS --> DCU
+    CCE -. "fecha de cierre" .-> DCU
+    ORD --> DDT
+    HIS --> DDT
+    ORD --> FOR
+    DCU --> FOR
+    DCH --> FOR
+    DCU --> FCC
+    FOR --> ASC
+    FOR --> ADS
+    DDT --> ADS
 ```
 
 | Capa | Dataset | Tipo SDP | Lenguaje | Lee de |
@@ -234,10 +245,17 @@ flowchart LR
 | silver | `orders` | materialized view | SQL | `orders_web_raw` ∪ `orders_store_raw` |
 | silver | `customers` | materialized view | Python | `customers_cdc_events` (SCD1) |
 | silver | `customers_history` | materialized view | Python | `customers_cdc_events` (SCD2) |
-| silver | `orders_enriched` | vista temporal | SQL | `orders` ⟕ `customers` |
-| gold | `sales_by_country` | materialized view | SQL | `orders_enriched` |
-| gold | `daily_sales_by_channel` | materialized view | SQL | `orders_enriched` |
+| gold · dimensión | `dim_channel` | materialized view | SQL | Lista fija de canales |
+| gold · dimensión | `dim_date` | materialized view | SQL | Rango de fechas de `orders` y `customers_history` |
+| gold · dimensión | `dim_customer` | materialized view | Python | `customers_history` (+ fecha de cierre de `customers_cdc_events`) |
+| gold · hecho | `fact_orders` | materialized view | SQL | `orders` ⋈ `dim_customer` (versión vigente al comprar) ⋈ `dim_channel` |
+| gold · hecho | `fact_customer_changes` | materialized view | Python | `dim_customer` (versión N-1 → N) |
+| gold · agregado | `agg_sales_by_country` | materialized view | SQL | `fact_orders` + `dim_customer` |
+| gold · agregado | `agg_daily_sales_by_channel` | materialized view | SQL | `fact_orders` + `dim_date` + `dim_channel` |
 | exports | `orders_export` | sink + append flow | Python | `orders_web_raw` ∪ `orders_store_raw` (streaming) |
+
+El código de gold está separado por lenguaje y por tipo de objeto: `gold/sql/{dimensions,facts,aggregates}` y
+`gold/python/{dimensions,facts}`. El detalle del modelo está en [`data-model.md`](data-model.md).
 
 ## 5. Capa bronze: ingesta incremental
 
@@ -337,13 +355,22 @@ Resultado:
 
 ![Medallion](https://img.shields.io/badge/Arquitectura-Medallion%20(bronze%2Fsilver%2Fgold)-8B5A2B)
 
-`orders_enriched` es una **vista temporal**: une cada pedido con el estado **actual** del cliente (país vigente,
-`N/A` si el cliente no existe) y calcula `order_date`. Existe solo durante la ejecución; no se publica.
+La capa gold es un **modelo dimensional (esquema en estrella)**: dimensiones, hechos y agregados derivados de
+los hechos. El detalle completo (diagrama, matriz de bus, granos, convenciones y controles de calidad) está en
+[`data-model.md`](data-model.md).
 
-| Dataset | Grano | Métricas |
+| Tipo | Dataset | Grano |
 |---|---|---|
-| `gold.sales_by_country` | País actual del cliente | `orders`, `customers` (distintos), `total_amount`, `average_order` |
-| `gold.daily_sales_by_channel` | Día × canal | `orders`, `total_amount` |
+| Dimensión | `dim_customer` | Una versión de un cliente (SCD2 con vigencia por fecha) |
+| Dimensión | `dim_date` | Un día |
+| Dimensión | `dim_channel` | Un canal |
+| Hecho | `fact_orders` | Un pedido, unido a la versión del cliente vigente al comprar |
+| Hecho | `fact_customer_changes` | Un cambio de versión de un cliente |
+| Agregado | `agg_sales_by_country` | Un país (actual) del cliente |
+| Agregado | `agg_daily_sales_by_channel` | Un día × un canal |
+
+Claves sustitutas determinísticas (`xxhash64`), miembro desconocido `-1` en cada dimensión y 7 controles de
+calidad que se corren con `bin/check-quality`.
 
 **Exportaciones.** `orders_export` es un **sink** de Structured Streaming (en producción sería Kafka o Event Hubs;
 aquí, archivos JSON en `data/export/orders`). Un único append flow une los dos canales y cada ejecución exporta
@@ -424,7 +451,9 @@ erDiagram
 | `sales_by_country` | Ventas por país |
 | `daily_sales_by_channel` | Ventas diarias |
 
-Las tablas gold no se relacionan con el resto: ya están agregadas. El servidor (`SparkServer`) es un parámetro
+Las tablas gold del reporte (`sales_by_country`, `daily_sales_by_channel`) leen de los agregados
+`agg_sales_by_country` y `agg_daily_sales_by_channel` (campo `source` de `model.json`) y no se relacionan con el
+resto: ya están agregadas. Los reportes nuevos pueden usar directamente la estrella (`fact_*` + `dim_*`). El servidor (`SparkServer`) es un parámetro
 de Power Query, así que apuntar el reporte a otro Thrift Server no requiere tocar las tablas.
 
 ## 9. Almacenamiento y estado

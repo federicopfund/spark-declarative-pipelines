@@ -183,7 +183,8 @@
       ]
     },
     "sales_by_country": {
-      "description": "Ventas agregadas por pais del cliente (capa gold).",
+      "description": "Ventas agregadas por pais del cliente (gold: agg_sales_by_country).",
+      "source": "agg_sales_by_country",
       "columns": [
         {
           "name": "country",
@@ -225,7 +226,8 @@
       ]
     },
     "daily_sales_by_channel": {
-      "description": "Ventas agregadas por dia y canal (capa gold).",
+      "description": "Ventas agregadas por dia y canal (gold: agg_daily_sales_by_channel).",
+      "source": "agg_daily_sales_by_channel",
       "columns": [
         {
           "name": "order_date",
@@ -259,6 +261,338 @@
           "description": "Importe total por dia y canal, ya agregado en la capa gold."
         }
       ]
+    },
+    "dim_date": {
+      "description": "Calendario (gold.dim_date). Grano: un dia. Tabla de fechas del modelo.",
+      "data_category": "Time",
+      "columns": [
+        {
+          "name": "date_key",
+          "type": "int64",
+          "summarize": "none",
+          "hidden": true
+        },
+        {
+          "name": "date",
+          "type": "date",
+          "summarize": "none",
+          "key": true,
+          "format": "dd/mm/yyyy"
+        },
+        {
+          "name": "year",
+          "type": "int64",
+          "summarize": "none",
+          "format": "0"
+        },
+        {
+          "name": "quarter",
+          "type": "int64",
+          "summarize": "none",
+          "format": "0"
+        },
+        {
+          "name": "month",
+          "type": "int64",
+          "summarize": "none",
+          "format": "0"
+        },
+        {
+          "name": "month_name",
+          "type": "string",
+          "summarize": "none",
+          "sort_by": "month"
+        },
+        {
+          "name": "year_month",
+          "type": "string",
+          "summarize": "none"
+        },
+        {
+          "name": "day_of_month",
+          "type": "int64",
+          "summarize": "none",
+          "format": "0"
+        },
+        {
+          "name": "day_of_week",
+          "type": "int64",
+          "summarize": "none",
+          "format": "0"
+        },
+        {
+          "name": "day_name",
+          "type": "string",
+          "summarize": "none",
+          "sort_by": "day_of_week"
+        },
+        {
+          "name": "is_weekend",
+          "type": "boolean",
+          "summarize": "none"
+        }
+      ]
+    },
+    "dim_channel": {
+      "description": "Canales de venta (gold.dim_channel). Grano: un canal.",
+      "columns": [
+        {
+          "name": "channel_key",
+          "type": "int64",
+          "summarize": "none",
+          "hidden": true
+        },
+        {
+          "name": "channel_code",
+          "type": "string",
+          "summarize": "none"
+        },
+        {
+          "name": "channel_name",
+          "type": "string",
+          "summarize": "none"
+        },
+        {
+          "name": "channel_type",
+          "type": "string",
+          "summarize": "none"
+        }
+      ]
+    },
+    "dim_customer": {
+      "description": "Clientes con historial (gold.dim_customer, SCD2). Grano: una version de un cliente.",
+      "columns": [
+        {
+          "name": "customer_sk",
+          "type": "int64",
+          "summarize": "none",
+          "hidden": true
+        },
+        {
+          "name": "customer_id",
+          "type": "int64",
+          "summarize": "none",
+          "format": "0"
+        },
+        {
+          "name": "version",
+          "type": "int64",
+          "summarize": "none",
+          "format": "0"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "summarize": "none"
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "summarize": "none"
+        },
+        {
+          "name": "country",
+          "type": "string",
+          "summarize": "none"
+        },
+        {
+          "name": "valid_from",
+          "type": "dateTime",
+          "summarize": "none",
+          "format": "dd/mm/yyyy hh:nn"
+        },
+        {
+          "name": "valid_to",
+          "type": "dateTime",
+          "summarize": "none",
+          "format": "dd/mm/yyyy hh:nn"
+        },
+        {
+          "name": "is_current",
+          "type": "boolean",
+          "summarize": "none"
+        }
+      ],
+      "measures": [
+        {
+          "name": "Clientes vigentes",
+          "expression": "CALCULATE ( DISTINCTCOUNT ( dim_customer[customer_id] ), dim_customer[is_current] = TRUE (), dim_customer[customer_id] <> -1 )",
+          "format": "#,0",
+          "description": "Clientes con una version vigente (excluye el miembro desconocido).",
+          "folder": "Modelo estrella"
+        }
+      ]
+    },
+    "fact_orders": {
+      "description": "Pedidos (gold.fact_orders). Grano: un pedido, con el cliente vigente al momento de la compra.",
+      "columns": [
+        {
+          "name": "order_id",
+          "type": "string",
+          "summarize": "none"
+        },
+        {
+          "name": "date_key",
+          "type": "int64",
+          "summarize": "none",
+          "hidden": true
+        },
+        {
+          "name": "customer_sk",
+          "type": "int64",
+          "summarize": "none",
+          "hidden": true
+        },
+        {
+          "name": "channel_key",
+          "type": "int64",
+          "summarize": "none",
+          "hidden": true
+        },
+        {
+          "name": "amount",
+          "type": "decimal",
+          "summarize": "sum",
+          "format": "\\$#,0.00;(\\$#,0.00);\\$#,0.00"
+        },
+        {
+          "name": "order_ts",
+          "type": "dateTime",
+          "summarize": "none",
+          "format": "dd/mm/yyyy hh:nn"
+        }
+      ],
+      "measures": [
+        {
+          "name": "Importe vendido",
+          "expression": "SUM ( fact_orders[amount] )",
+          "format": "\\$#,0.00;(\\$#,0.00);\\$#,0.00",
+          "description": "Importe de los pedidos.",
+          "folder": "Modelo estrella"
+        },
+        {
+          "name": "Cantidad de pedidos",
+          "expression": "COUNTROWS ( fact_orders )",
+          "format": "#,0",
+          "description": "Pedidos.",
+          "folder": "Modelo estrella"
+        },
+        {
+          "name": "Clientes compradores",
+          "expression": "DISTINCTCOUNT ( dim_customer[customer_id] )",
+          "format": "#,0",
+          "description": "Clientes distintos con pedidos en el contexto (filtra por la relacion con fact_orders).",
+          "folder": "Modelo estrella"
+        },
+        {
+          "name": "Importe promedio",
+          "expression": "DIVIDE ( [Importe vendido], [Cantidad de pedidos] )",
+          "format": "\\$#,0.00;(\\$#,0.00);\\$#,0.00",
+          "description": "Importe promedio por pedido.",
+          "folder": "Modelo estrella"
+        }
+      ]
+    },
+    "fact_customer_changes": {
+      "description": "Cambios de clientes (gold.fact_customer_changes). Grano: un cambio de version.",
+      "columns": [
+        {
+          "name": "change_sk",
+          "type": "int64",
+          "summarize": "none",
+          "hidden": true
+        },
+        {
+          "name": "date_key",
+          "type": "int64",
+          "summarize": "none",
+          "hidden": true
+        },
+        {
+          "name": "customer_sk",
+          "type": "int64",
+          "summarize": "none",
+          "hidden": true
+        },
+        {
+          "name": "previous_customer_sk",
+          "type": "int64",
+          "summarize": "none",
+          "hidden": true
+        },
+        {
+          "name": "customer_id",
+          "type": "int64",
+          "summarize": "none",
+          "format": "0"
+        },
+        {
+          "name": "from_version",
+          "type": "int64",
+          "summarize": "none",
+          "format": "0"
+        },
+        {
+          "name": "to_version",
+          "type": "int64",
+          "summarize": "none",
+          "format": "0"
+        },
+        {
+          "name": "from_country",
+          "type": "string",
+          "summarize": "none"
+        },
+        {
+          "name": "to_country",
+          "type": "string",
+          "summarize": "none"
+        },
+        {
+          "name": "country_changed",
+          "type": "boolean",
+          "summarize": "none"
+        },
+        {
+          "name": "email_changed",
+          "type": "boolean",
+          "summarize": "none"
+        },
+        {
+          "name": "name_changed",
+          "type": "boolean",
+          "summarize": "none"
+        },
+        {
+          "name": "changed_at",
+          "type": "dateTime",
+          "summarize": "none",
+          "format": "dd/mm/yyyy hh:nn"
+        }
+      ],
+      "measures": [
+        {
+          "name": "Cambios",
+          "expression": "COUNTROWS ( fact_customer_changes )",
+          "format": "#,0",
+          "description": "Cambios de version.",
+          "folder": "Modelo estrella"
+        },
+        {
+          "name": "Cambios de país",
+          "expression": "CALCULATE ( [Cambios], fact_customer_changes[country_changed] = TRUE () )",
+          "format": "#,0",
+          "description": "Cambios en los que cambio el pais.",
+          "folder": "Modelo estrella"
+        },
+        {
+          "name": "Cambios de email",
+          "expression": "CALCULATE ( [Cambios], fact_customer_changes[email_changed] = TRUE () )",
+          "format": "#,0",
+          "description": "Cambios en los que cambio el email.",
+          "folder": "Modelo estrella"
+        }
+      ]
     }
   },
   "relationships": [
@@ -269,6 +603,26 @@
     {
       "from": "customers_history.customer_id",
       "to": "customers.customer_id"
+    },
+    {
+      "from": "fact_orders.date_key",
+      "to": "dim_date.date_key"
+    },
+    {
+      "from": "fact_orders.customer_sk",
+      "to": "dim_customer.customer_sk"
+    },
+    {
+      "from": "fact_orders.channel_key",
+      "to": "dim_channel.channel_key"
+    },
+    {
+      "from": "fact_customer_changes.date_key",
+      "to": "dim_date.date_key"
+    },
+    {
+      "from": "fact_customer_changes.customer_sk",
+      "to": "dim_customer.customer_sk"
     }
   ]
 }

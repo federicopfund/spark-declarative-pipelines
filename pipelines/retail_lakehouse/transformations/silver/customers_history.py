@@ -18,7 +18,8 @@ spark: SparkSession
 )
 def customers_history() -> DataFrame:
     return apply_changes_scd2(
-        spark.read.table("retail.customers_cdc_events"),
+        # Vista temporal de silver/inputs.sql: asi SDP registra la dependencia con bronze y espera a que termine.
+        spark.table("src_customers_cdc_events"),
         keys=["customer_id"],
         sequence_by="version",
         apply_as_deletes="op = 'DELETE'",

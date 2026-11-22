@@ -68,6 +68,7 @@ bin\setup-dependencies.cmd
 | `land-batch -Batch N [-Reset]` | Copia `data/samples/batch-00N` a `data/landing/`. `-Reset` vacía landing y export. |
 | `spark-pipelines run` / `dry-run` | CLI de SDP contra Spark Connect. Renderiza la spec y acepta las opciones de `spark-pipelines` (`--refresh`, `--full-refresh`, …). |
 | `query-lakehouse [tablas...]` | Muestra las tablas del pipeline por Spark Connect. |
+| `check-quality [prefijos...]` | Corre los controles de calidad del modelo dimensional (`pipelines/retail_lakehouse/quality/`). Sale con código 1 si alguno falla. |
 | `reset-pipeline` | Borra todo el estado (tablas, checkpoints, metastore, landing, export) y reinicia el cluster. |
 
 Ejemplo de una corrida completa con los tres lotes de ejemplo, desde un estado limpio
@@ -82,6 +83,7 @@ bin\spark-pipelines.cmd run
 bin\land-batch.cmd -Batch 3
 bin\spark-pipelines.cmd run
 bin\query-lakehouse.cmd customers customers_history
+bin\check-quality.cmd
 ```
 
 ## 4. Logs e interfaces web
@@ -106,7 +108,7 @@ El nivel de log se define en `conf/log4j2.properties` (`warn` por defecto).
 
 ```sql
 SHOW TABLES IN retail;
-SELECT * FROM retail.sales_by_country ORDER BY total_amount DESC;
+SELECT * FROM retail.agg_sales_by_country ORDER BY total_amount DESC;
 ```
 
 Usuario y contraseña son obligatorios para el cliente, pero el servidor no los valida (autenticación `NONE`).
