@@ -286,6 +286,7 @@ cambios por fecha y el detalle de cada cambio con el país anterior y el nuevo.
 |---|---|
 | [`docs/architecture.md`](docs/architecture.md) | Componentes, puertos, flujo de datos, modelo de Power BI y camino a producción |
 | [`docs/data-model.md`](docs/data-model.md) | Modelo dimensional: esquema en estrella, matriz de bus, granos, convenciones y controles de calidad |
+| [`docs/agents.md`](docs/agents.md) | Equipo de agentes de punta a punta: roles, contratos, puertas de calidad y validación cruzada |
 | [`docs/operations.md`](docs/operations.md) | Scripts de `bin/`, logs, consultas SQL por Thrift, Power BI y errores conocidos |
 | [`data/samples/README.md`](data/samples/README.md) | Qué ejercita cada lote de datos de ejemplo y el resultado esperado |
 | [`bi/specs/README.md`](bi/specs/README.md) | Equipo de agentes de BI (`/build-report`): requerimientos, modelado, diseño, construcción y QA de reportes |
