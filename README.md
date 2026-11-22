@@ -155,7 +155,7 @@ flowchart LR
   calculados desde los hechos. Cada pedido se une a la versión del cliente **vigente al momento de la compra**.
   Ver [`docs/data-model.md`](docs/data-model.md).
 - **Exports** publica los pedidos nuevos fuera del pipeline, en un único flow para los dos canales.
-- **Power BI** importa silver y gold por el Thrift JDBC/ODBC Server.
+- **Power BI** importa el modelo en estrella de gold por el Thrift JDBC/ODBC Server.
 
 ## Datasets
 
@@ -193,7 +193,7 @@ flowchart LR
 ├── clients/                         Clientes Spark Connect (catálogo, consultas, controles de calidad)
 ├── bin/                             Scripts de operación (Windows: .cmd → .ps1)
 ├── conf/                            spark-defaults, log4j2, entorno (spark-env.ps1)
-├── bi/powerbi/                      Proyecto Power BI (PBIP) + generador del modelo
+├── bi/                              Power BI: reporte único (powerbi/), specs del equipo de agentes y tema (design/)
 ├── data/samples/                    Lotes de datos de ejemplo
 ├── docs/                            Arquitectura, operación e imágenes
 └── jars/                            Jars extra opcionales (no versionados)
@@ -251,18 +251,21 @@ Abrir `bi/powerbi/RetailLakehouse.pbip` y **Actualizar**. Credenciales: *Nombre 
 con cualquier valor (el Thrift Server local no tiene autenticación; solo escucha en `127.0.0.1`).
 Ver `docs/operations.md`.
 
-El reporte `RetailLakehouse` importa las tablas silver y gold por el Thrift Server
-(conector Spark, protocolo Standard) y tiene dos páginas:
+`RetailLakehouse` es el **único reporte** del proyecto (versión **2.0**, historial en
+[`CHANGELOG.md`](bi/specs/retail-lakehouse/CHANGELOG.md)). Importa el modelo en estrella de gold por el Thrift
+Server (conector Spark, protocolo Standard) y sigue el sistema de diseño **LakehouseModern**
+(`bi/design/`). Lo mejora el equipo de agentes de BI con `/build-report "<pedido>"` (ver
+[`bi/specs/README.md`](bi/specs/README.md)).
 
-**Ventas**: indicadores de ventas, pedidos, clientes y ticket promedio; ventas por país y por día y canal
-(capa gold) y el detalle de pedidos (capa silver).
+**Resumen de ventas**: importe, pedidos, clientes y ticket promedio; importe por fecha, canal, país al comprar
+(la versión del cliente vigente en la compra) y cliente, con filtros de canal y año-mes.
 
-![Página Ventas del reporte RetailLakehouse](docs/images/powerbi-ventas.png)
+![Página Resumen de ventas del reporte RetailLakehouse](docs/images/powerbi-resumen-de-ventas.png)
 
-**Clientes**: resultado del CDC. Clientes vigentes (SCD1) e historial completo de versiones (SCD2) con su
-vigencia (`__START_AT` / `__END_AT`) y su estado.
+**Cambios de clientes**: resultado del CDC (SCD2). Cambios por tipo (país, email, nombre), clientes con cambios,
+cambios por fecha y el detalle de cada cambio con el país anterior y el nuevo.
 
-![Página Clientes del reporte RetailLakehouse](docs/images/powerbi-clientes.png)
+![Página Cambios de clientes del reporte RetailLakehouse](docs/images/powerbi-cambios-de-clientes.png)
 
 ## Limitaciones
 
