@@ -9,13 +9,8 @@ model Model
 
 annotation __PBI_TimeIntelligenceEnabled = 0
 
-annotation PBI_QueryOrder = ["SparkServer","orders","customers","customers_history","sales_by_country","daily_sales_by_channel","dim_date","dim_channel","dim_customer","fact_orders","fact_customer_changes"]
+annotation PBI_QueryOrder = ["SparkServer","dim_date","dim_channel","dim_customer","fact_orders","fact_customer_changes"]
 
-ref table orders
-ref table customers
-ref table customers_history
-ref table sales_by_country
-ref table daily_sales_by_channel
 ref table dim_date
 ref table dim_channel
 ref table dim_customer

@@ -1,0 +1,216 @@
+{
+  "*": {
+    "columnHeaders": [
+      {
+        "alignment": "Center",
+        "autoSizeColumnWidth": true,
+        "backColor": {
+          "solid": {
+            "color": "#F5F5F5"
+          }
+        },
+        "fontFamily": "Segoe UI Semibold",
+        "fontSize": 10.5,
+        "fontColor": {
+          "solid": {
+            "color": "#333333"
+          }
+        },
+        "bold": false,
+        "italic": false,
+        "underline": false,
+        "outlineColor": {
+          "solid": {
+            "color": "#E0E0E0"
+          }
+        },
+        "outlineStyle": 1,
+        "outlineWeight": 1,
+        "wordWrap": false
+      }
+    ],
+    "rowHeaders": [
+      {
+        "alignment": "Left",
+        "autoSizeColumnWidth": true,
+        "backColor": {
+          "solid": {
+            "color": "#F5F5F5"
+          }
+        },
+        "fontFamily": "Segoe UI Semibold",
+        "fontSize": 10.5,
+        "fontColor": {
+          "solid": {
+            "color": "#333333"
+          }
+        },
+        "bold": false,
+        "italic": false,
+        "underline": false,
+        "outlineColor": {
+          "solid": {
+            "color": "#E0E0E0"
+          }
+        },
+        "outlineStyle": 1,
+        "outlineWeight": 1,
+        "wordWrap": false,
+        "legacyStyleDisabled": true,
+        "showExpandCollapseButtons": true,
+        "stepped": true,
+        "steppedLayoutIndentation": 16
+      }
+    ],
+    "general": [
+      {
+        "formatString": "0.0"
+      }
+    ],
+    "grid": [
+      {
+        "gridHorizontal": true,
+        "gridHorizontalColor": {
+          "solid": {
+            "color": "#E8E8E8"
+          }
+        },
+        "gridHorizontalWeight": 1,
+        "gridVertical": false,
+        "gridVerticalColor": {
+          "solid": {
+            "color": "#E8E8E8"
+          }
+        },
+        "gridVerticalWeight": 1,
+        "imageHeight": 50,
+        "imageWidth": 125,
+        "outlineColor": {
+          "solid": {
+            "color": "#E0E0E0"
+          }
+        },
+        "outlineStyle": 1,
+        "outlineWeight": 1,
+        "rowPadding": 5,
+        "textSize": 10
+      }
+    ],
+    "values": [
+      {
+        "backColor": {
+          "solid": {
+            "color": "#FFFFFF"
+          }
+        },
+        "backColorPrimary": {
+          "solid": {
+            "color": "#FFFFFF"
+          }
+        },
+        "backColorSecondary": {
+          "solid": {
+            "color": "#F9F9F9"
+          }
+        },
+        "fontColor": {
+          "solid": {
+            "color": "#404040"
+          }
+        },
+        "fontColorPrimary": {
+          "solid": {
+            "color": "#404040"
+          }
+        },
+        "fontColorSecondary": {
+          "solid": {
+            "color": "#404040"
+          }
+        },
+        "fontFamily": "Segoe UI",
+        "fontSize": 10,
+        "bold": false,
+        "italic": false,
+        "underline": false
+      }
+    ],
+    "total": [
+      {
+        "totals": true,
+        "backColor": {
+          "solid": {
+            "color": "#EBEBEB"
+          }
+        },
+        "fontColor": {
+          "solid": {
+            "color": "#333333"
+          }
+        },
+        "fontFamily": "Segoe UI Semibold",
+        "fontSize": 10.5,
+        "outlineColor": {
+          "solid": {
+            "color": "#D0D0D0"
+          }
+        },
+        "outlineStyle": 1,
+        "outlineWeight": 1,
+        "bold": false,
+        "italic": false,
+        "underline": false
+      }
+    ],
+    "subTotals": [
+      {
+        "columnSubtotals": true,
+        "perColumnLevel": false,
+        "rowSubtotals": true,
+        "perRowLevel": true,
+        "rowSubtotalsPosition": "Top",
+        "backColor": {
+          "solid": {
+            "color": "#F0F0F0"
+          }
+        },
+        "fontColor": {
+          "solid": {
+            "color": "#333333"
+          }
+        },
+        "fontFamily": "Segoe UI Semibold",
+        "fontSize": 10.5,
+        "outlineColor": {
+          "solid": {
+            "color": "#D8D8D8"
+          }
+        },
+        "outlineStyle": 1,
+        "outlineWeight": 1,
+        "bold": false,
+        "italic": false,
+        "underline": false
+      }
+    ],
+    "sparklines": [
+      {
+        "chartType": "line",
+        "dataColor": {
+          "solid": {
+            "color": "#1971c2"
+          }
+        },
+        "strokeWidth": 2,
+        "markerColor": {
+          "solid": {
+            "color": "#1971c2"
+          }
+        },
+        "markerShape": "circle",
+        "markerSize": 3,
+        "markers": 3
+      }
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "*": {
+    "background": [
+      {
+        "show": false
+      }
+    ],
+    "general": [
+      {
+        "keepLayerOrder": true
+      }
+    ],
+    "visualHeader": [
+      {
+        "show": false
+      }
+    ]
+  }
+}

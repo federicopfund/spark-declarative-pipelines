@@ -38,5 +38,12 @@ if (-not (Test-Path $cliPy)) { throw "SDP CLI not found: $cliPy" }
 Push-Location $ProjectRoot
 try {
     & "$env:SPARK_HOME\bin\spark-class.cmd" org.apache.spark.deploy.SparkPipelines $cliPy @cliArgs
-    exit $LASTEXITCODE
+    $exitCode = $LASTEXITCODE
 } finally { Pop-Location }
+
+# Despues de una corrida exitosa, el Thrift Server tiene que olvidar los archivos de las tablas reescritas
+if ($command -eq 'run' -and $exitCode -eq 0) {
+    Write-Host '==> Thrift Server' -ForegroundColor Cyan
+    Update-ThriftCache
+}
+exit $exitCode

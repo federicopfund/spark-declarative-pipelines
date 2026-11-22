@@ -66,8 +66,9 @@ bin\setup-dependencies.cmd
 | `start-cluster [-WorkerCores 3] [-WorkerMemory 3g] [-NoThrift]` | Levanta Derby, master, worker y Spark Connect, crea la base `retail` y levanta el Thrift Server. Idempotente. |
 | `stop-cluster` | Detiene Thrift, Connect, worker, master y por último Derby (apagado ordenado). |
 | `land-batch -Batch N [-Reset]` | Copia `data/samples/batch-00N` a `data/landing/`. `-Reset` vacía landing y export. |
-| `spark-pipelines run` / `dry-run` | CLI de SDP contra Spark Connect. Renderiza la spec y acepta las opciones de `spark-pipelines` (`--refresh`, `--full-refresh`, …). |
+| `spark-pipelines run` / `dry-run` | CLI de SDP contra Spark Connect. Renderiza la spec y acepta las opciones de `spark-pipelines` (`--refresh`, `--full-refresh`, …). Después de un `run` exitoso refresca la caché del Thrift Server. |
 | `query-lakehouse [tablas...]` | Muestra las tablas del pipeline por Spark Connect. |
+| `refresh-thrift` | `REFRESH TABLE` de todas las tablas de `retail` en el Thrift Server. `spark-pipelines run` lo hace solo al terminar bien. |
 | `check-quality [prefijos...]` | Corre los controles de calidad del modelo dimensional (`pipelines/retail_lakehouse/quality/`). Sale con código 1 si alguno falla. |
 | `reset-pipeline` | Borra todo el estado (tablas, checkpoints, metastore, landing, export) y reinicia el cluster. |
 
@@ -122,18 +123,26 @@ Usuario y contraseña son obligatorios para el cliente, pero el servidor no los 
 2. **Actualizar**. En credenciales elegir *Nombre de usuario y contraseña* (cualquier valor) y, si lo pide,
    aceptar la conexión sin cifrar.
 
-### Regenerar el modelo semántico
+### Un solo reporte, versionado
 
-El TMDL se genera desde `bi/powerbi/tools/generate_model.py` (tablas, tipos, medidas, relaciones). Los
-`lineageTag` son determinísticos, así que regenerar no cambia la identidad de los objetos:
+`RetailLakehouse` es el único reporte del proyecto, sobre el modelo estrella de gold. Lo mejora el equipo de
+agentes con `/build-report "<pedido>"`, que sube la versión y registra el cambio en
+`bi/specs/retail-lakehouse/CHANGELOG.md`. El diseño sigue el sistema LakehouseModern (skill `bi-design-system`,
+tema en `bi/design/LakehouseModern.Theme/`).
+
+### Regenerar el modelo y el reporte
+
+Con Power BI Desktop **cerrado** (pbir no puede validar los campos con el reporte abierto):
 
 ```powershell
 .venv\Scripts\python bi\powerbi\tools\generate_model.py
+.venv\Scripts\python bi\powerbi\tools\build_report.py bi\specs\retail-lakehouse\layout.json --replace
 ```
 
-Los visuales se crearon con el CLI `pbir` a partir de `bi/powerbi/tools/visuals-*.json`. Con la opción
-*Enable external tool access…* activada en Desktop, `pbir desktop refresh` recarga el reporte abierto y
-`pbir desktop screenshot` captura sus páginas (así se generaron las imágenes de `docs/images/`).
+Los `lineageTag` del modelo son determinísticos, así que regenerar no cambia la identidad de los objetos.
+`layout.json` es la fuente de verdad del reporte: un cambio hecho a mano en Desktop se pierde en la próxima
+reconstrucción si no se pasa al layout. Con *Enable external tool access…* activada en Desktop,
+`pbir desktop screenshot RetailLakehouse.Report --all --output-dir <carpeta>` captura las páginas.
 
 ## 7. Solución de problemas
 
@@ -141,6 +150,9 @@ Los visuales se crearon con el CLI `pbir` a partir de `bi/powerbi/tools/visuals-
 |---|---|---|
 | *Report is using the PBIR format. Please enable the preview feature…* | Formato PBIR desactivado en Desktop | Opciones → Características en versión preliminar → *Store reports using enhanced metadata format (PBIR)*; reiniciar Desktop |
 | *Can't resolve schema '3.3.0' in 'report.json'* | Power BI Desktop anterior a 2026 | Actualizar Desktop. Si conviven la versión de Microsoft Store y la instalada (MSI), abrir con `C:\Program Files\Microsoft Power BI Desktop\bin\PBIDesktop.exe` |
+| Power BI: `FAILED_READ_FILE.FILE_NOT_EXIST ... It is possible the underlying files have been updated` | El Thrift Server cachea los archivos de cada tabla y el pipeline los reescribe en cada corrida | `bin\refresh-thrift.cmd` y volver a actualizar. No actualizar Power BI mientras corre el pipeline. |
+| Power BI: *La columna 'date' de la tabla 'dim_date' contiene valores en blanco* | Una tabla de fechas no admite blancos en la columna clave | Ya resuelto: `dim_date` no tiene miembro desconocido (ver `data-model.md`) |
+| `build_report.py`: *No se puede cargar el archivo o ensamblado 'Microsoft.AnalysisServices.AdomdClient'* | Power BI Desktop tiene el reporte abierto y pbir intenta leer el modelo desde su motor local | Cerrar Desktop y volver a correr el script |
 | beeline se queda esperando | Pide la contraseña por teclado | Pasar `-p` con cualquier valor |
 | `Derby client not found in tools\derby` | Faltan los jars de Derby en modo red | `bin\setup-dependencies.cmd` |
 | Un script falla con *NativeCommandError* | PowerShell 5.1 trata el stderr de un ejecutable como error si se redirige con `2>&1` | Usar los `.cmd` de `bin\`, o no redirigir stderr |

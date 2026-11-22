@@ -1,0 +1,28 @@
+{
+  "*": {
+    "background": [
+      { "color": { "solid": { "color": "#F5F6FA" } }, "transparency": 0 }
+    ],
+    "displayArea": [
+      { "verticalAlignment": "Top" }
+    ],
+    "filterCard": [
+      {
+        "backgroundColor": { "solid": { "color": "#FFFFFF" } },
+        "border": true,
+        "borderColor": { "solid": { "color": "#E2E8F0" } },
+        "fontFamily": "Segoe UI",
+        "foregroundColor": { "solid": { "color": "#334155" } },
+        "inputBoxColor": { "solid": { "color": "#F8FAFC" } },
+        "textSize": 9,
+        "transparency": 0
+      }
+    ],
+    "outspace": [
+      { "color": { "solid": { "color": "#F5F6FA" } }, "transparency": 0 }
+    ],
+    "pageSize": [
+      { "pageSizeTypes": "Custom", "pageSizeHeight": 720, "pageSizeWidth": 1280 }
+    ]
+  }
+}

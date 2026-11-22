@@ -1,0 +1,16 @@
+{
+  "*": {
+    "labels": [
+      {
+        "show": false,
+        "enableValueDataLabel": false
+      }
+    ],
+    "smallMultiplesLayout": [
+      {
+        "backgroundTransparency": 0,
+        "gridLineType": "inner"
+      }
+    ]
+  }
+}

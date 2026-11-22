@@ -1,0 +1,17 @@
+{
+  "*": {
+    "bubbleLayer": [
+      {
+        "bubbleRadius": 8,
+        "minBubbleRadius": 8,
+        "maxRadius": 40
+      }
+    ],
+    "barChart": [
+      {
+        "barHeight": 3,
+        "thickness": 3
+      }
+    ]
+  }
+}

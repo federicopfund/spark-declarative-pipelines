@@ -1,0 +1,15 @@
+{
+  "*": {
+    "labels": [
+      {
+        "show": false
+      }
+    ],
+    "smallMultiplesLayout": [
+      {
+        "backgroundTransparency": 0,
+        "gridLineType": "inner"
+      }
+    ]
+  }
+}

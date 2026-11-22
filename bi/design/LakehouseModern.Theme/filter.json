@@ -1,0 +1,10 @@
+{
+  "*": {
+    "general": [
+      {
+        "isInvertedSelectionMode": false,
+        "requireSingleSelect": true
+      }
+    ]
+  }
+}

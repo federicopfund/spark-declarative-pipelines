@@ -1,0 +1,99 @@
+{
+  "*": {
+    "legend": [
+      {
+        "showGradientLegend": false,
+        "show": true,
+        "showTitle": false,
+        "fontSize": 8,
+        "position": "Right",
+        "bold": false,
+        "italic": false,
+        "underline": false
+      }
+    ],
+    "dataPoint": [
+      {
+        "fillTransparency": 50,
+        "borderColorMatchFill": true,
+        "borderOutlineOnly": true,
+        "borderShow": true,
+        "borderSize": 2
+      }
+    ],
+    "labels": [
+      {
+        "show": true,
+        "showAll": true,
+        "showByDefault": true,
+        "showSeries": true,
+        "enableBackground": false,
+        "enableDetailDataLabel": false,
+        "detailContentType": "Custom",
+        "enableTitleDataLabel": false,
+        "titleContentType": "Custom",
+        "enableValueDataLabel": true,
+        "optimizeLabelDisplay": false,
+        "color": {
+          "solid": {
+            "color": "#1971c2"
+          }
+        },
+        "detailColor": {
+          "solid": {
+            "color": "#1971c2"
+          }
+        },
+        "titleColor": {
+          "solid": {
+            "color": "#1971c2"
+          }
+        },
+        "labelOverflow": true,
+        "labelPosition": "OutsideEnd",
+        "labelContentLayout": "SingleLine",
+        "showBlankAs": "--",
+        "detailShowBlankAs": "--",
+        "titleShowBlankAs": "Unassigned",
+        "transparency": 0,
+        "wordWrap": false,
+        "bold": true,
+        "detailBold": false,
+        "titleBold": true,
+        "italic": false,
+        "detailItalic": false,
+        "titleItalic": false,
+        "underline": false,
+        "detailUnderline": false,
+        "titleUnderline": false
+      }
+    ],
+    "valueAxis": [
+      {
+        "show": false,
+        "showAxisTitle": true
+      }
+    ],
+    "smallMultiplesLayout": [
+      {
+        "backgroundTransparency": 0,
+        "gridLineType": "inner"
+      }
+    ],
+    "xAxisReferenceLine": [
+      {
+        "show": true,
+        "style": "solid",
+        "lineColor": {
+          "solid": {
+            "color": "#333333"
+          }
+        },
+        "transparency": 66,
+        "value": 0,
+        "width": 2,
+        "position": "back"
+      }
+    ]
+  }
+}

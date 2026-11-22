@@ -1,0 +1,14 @@
+{
+  "*": {
+    "labels": [
+      {
+        "show": false
+      }
+    ],
+    "valueAxis": [
+      {
+        "show": true
+      }
+    ]
+  }
+}

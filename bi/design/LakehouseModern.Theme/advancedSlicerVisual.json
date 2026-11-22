@@ -1,0 +1,44 @@
+{
+  "*": {
+    "layout": [
+      {
+        "maxTiles": 3,
+        "cellPadding": 4,
+        "columnCount": 3,
+        "rowCount": 1
+      }
+    ],
+    "shapeCustomRectangle": [
+      {
+        "tileShape": "rectangleRoundedByPixel",
+        "rectangleRoundedCurve": 8
+      }
+    ],
+    "value": [
+      {
+        "show": true,
+        "fontSize": 11,
+        "horizontalAlignment": "center",
+        "verticalAlignment": "middle",
+        "bold": true
+      }
+    ],
+    "selection": [
+      {
+        "singleSelect": true
+      }
+    ],
+    "outline": [
+      {
+        "show": true,
+        "weight": 1
+      }
+    ],
+    "overFlow": [
+      {
+        "overFlowDirection": 1,
+        "overFlowStyle": 1
+      }
+    ]
+  }
+}

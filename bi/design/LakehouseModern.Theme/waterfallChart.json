@@ -1,0 +1,23 @@
+{
+  "*": {
+    "valueAxis": [
+      {
+        "show": false
+      }
+    ],
+    "legend": [
+      {
+        "show": false
+      }
+    ],
+    "sentimentColors": [
+      {
+        "totalFill": {
+          "solid": {
+            "color": "#CCCCCC"
+          }
+        }
+      }
+    ]
+  }
+}

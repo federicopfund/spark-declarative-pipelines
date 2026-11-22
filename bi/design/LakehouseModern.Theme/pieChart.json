@@ -1,0 +1,15 @@
+{
+  "*": {
+    "legend": [
+      {
+        "show": true,
+        "position": "RightCenter"
+      }
+    ],
+    "labels": [
+      {
+        "labelStyle": "Data value, percent of total"
+      }
+    ]
+  }
+}

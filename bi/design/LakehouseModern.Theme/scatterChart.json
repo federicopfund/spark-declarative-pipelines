@@ -1,0 +1,30 @@
+{
+  "*": {
+    "bubbles": [
+      {
+        "bubbleSize": -10,
+        "markerRangeType": "auto"
+      }
+    ],
+    "general": [
+      {
+        "responsive": true
+      }
+    ],
+    "fillPoint": [
+      {
+        "show": true
+      }
+    ],
+    "legend": [
+      {
+        "showGradientLegend": true
+      }
+    ],
+    "labels": [
+      {
+        "show": false
+      }
+    ]
+  }
+}

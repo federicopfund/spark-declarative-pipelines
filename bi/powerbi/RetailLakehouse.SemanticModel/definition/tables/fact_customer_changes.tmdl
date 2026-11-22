@@ -2,23 +2,35 @@
 table fact_customer_changes
 	lineageTag: e1ca2cf3-6354-571e-aa40-20cbe7bbcf10
 
-	/// Cambios de version.
-	measure Cambios = COUNTROWS ( fact_customer_changes )
+	/// Cambios de version de clientes.
+	measure Cambios = VAR _n = COUNTROWS ( fact_customer_changes ) RETURN IF ( ISINSCOPE ( dim_date[date] ), _n, COALESCE ( _n, 0 ) )
 		formatString: #,0
-		displayFolder: Modelo estrella
+		displayFolder: Medidas
 		lineageTag: b38e08a9-150f-5dfa-8c26-7c994c7b9bda
 
 	/// Cambios en los que cambio el pais.
-	measure 'Cambios de país' = CALCULATE ( [Cambios], fact_customer_changes[country_changed] = TRUE () )
+	measure 'Cambios de país' = COALESCE ( CALCULATE ( [Cambios], fact_customer_changes[country_changed] = TRUE () ), 0 )
 		formatString: #,0
-		displayFolder: Modelo estrella
+		displayFolder: Medidas
 		lineageTag: e7242909-a568-5e27-9306-9fa582cc59ef
 
 	/// Cambios en los que cambio el email.
-	measure 'Cambios de email' = CALCULATE ( [Cambios], fact_customer_changes[email_changed] = TRUE () )
+	measure 'Cambios de email' = COALESCE ( CALCULATE ( [Cambios], fact_customer_changes[email_changed] = TRUE () ), 0 )
 		formatString: #,0
-		displayFolder: Modelo estrella
+		displayFolder: Medidas
 		lineageTag: 32c12f5b-b8a1-5733-8a64-f018ea6cb9da
+
+	/// Cambios en los que cambio el nombre.
+	measure 'Cambios de nombre' = COALESCE ( CALCULATE ( [Cambios], fact_customer_changes[name_changed] = TRUE () ), 0 )
+		formatString: #,0
+		displayFolder: Medidas
+		lineageTag: 47e225cf-6a87-5537-b879-e65dd72ab181
+
+	/// Clientes distintos (customer_id) con al menos un cambio.
+	measure 'Clientes con cambios' = COALESCE ( DISTINCTCOUNT ( fact_customer_changes[customer_id] ), 0 )
+		formatString: #,0
+		displayFolder: Medidas
+		lineageTag: 9329d6c4-a1a4-53b0-92e1-91ad05bcf63f
 
 	column change_sk
 		dataType: int64

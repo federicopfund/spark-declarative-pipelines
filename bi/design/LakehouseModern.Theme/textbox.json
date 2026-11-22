@@ -1,0 +1,44 @@
+{
+  "*": {
+    "general": [
+      {
+        "keepLayerOrder": true
+      }
+    ],
+    "title": [
+      {
+        "show": false
+      }
+    ],
+    "subTitle": [
+      {
+        "show": false
+      }
+    ],
+    "divider": [
+      {
+        "show": false
+      }
+    ],
+    "background": [
+      {
+        "show": false
+      }
+    ],
+    "border": [
+      {
+        "show": false
+      }
+    ],
+    "dropShadow": [
+      {
+        "show": false
+      }
+    ],
+    "visualHeader": [
+      {
+        "show": false
+      }
+    ]
+  }
+}

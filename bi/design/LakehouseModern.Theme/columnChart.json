@@ -1,0 +1,20 @@
+{
+  "*": {
+    "general": [
+      {
+        "responsive": true
+      }
+    ],
+    "legend": [
+      {
+        "showGradientLegend": true
+      }
+    ],
+    "smallMultiplesLayout": [
+      {
+        "backgroundTransparency": 0,
+        "gridLineType": "inner"
+      }
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "*": {
+    "background": [
+      {
+        "show": false
+      }
+    ],
+    "visualHeader": [
+      {
+        "show": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,182 @@
+{
+  "name": "tabla_cambios",
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "queryRef": "dim_customer.name",
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_customer"
+                    }
+                  },
+                  "Property": "name"
+                }
+              },
+              "nativeQueryRef": "name",
+              "displayName": "Cliente"
+            },
+            {
+              "queryRef": "fact_customer_changes.changed_at",
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_customer_changes"
+                    }
+                  },
+                  "Property": "changed_at"
+                }
+              },
+              "nativeQueryRef": "changed_at",
+              "displayName": "Fecha del cambio"
+            },
+            {
+              "queryRef": "fact_customer_changes.from_country",
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_customer_changes"
+                    }
+                  },
+                  "Property": "from_country"
+                }
+              },
+              "nativeQueryRef": "from_country",
+              "displayName": "País anterior"
+            },
+            {
+              "queryRef": "fact_customer_changes.to_country",
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_customer_changes"
+                    }
+                  },
+                  "Property": "to_country"
+                }
+              },
+              "nativeQueryRef": "to_country",
+              "displayName": "País nuevo"
+            },
+            {
+              "queryRef": "fact_customer_changes.from_version",
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_customer_changes"
+                    }
+                  },
+                  "Property": "from_version"
+                }
+              },
+              "nativeQueryRef": "from_version",
+              "displayName": "Versión anterior"
+            },
+            {
+              "queryRef": "fact_customer_changes.to_version",
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_customer_changes"
+                    }
+                  },
+                  "Property": "to_version"
+                }
+              },
+              "nativeQueryRef": "to_version",
+              "displayName": "Versión nueva"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "fact_customer_changes"
+                  }
+                },
+                "Property": "changed_at"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "total": [
+        {
+          "properties": {
+            "totals": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Detalle de cambios'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "position": {
+    "x": 280,
+    "y": 460,
+    "width": 980,
+    "height": 250,
+    "z": 0,
+    "tabOrder": 0
+  },
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json"
+}

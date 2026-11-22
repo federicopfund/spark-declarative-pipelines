@@ -1,186 +1,106 @@
 {
   "report": "RetailLakehouse",
   "model": "RetailLakehouse",
+  "label": "Retail Lakehouse",
+  "version": "2.0",
+  "theme": "bi/design/LakehouseModern.Theme",
+  "field_names": {
+    "dim_customer.name": "Cliente",
+    "dim_customer.country": "País al comprar",
+    "dim_channel.channel_name": "Canal",
+    "dim_date.year_month": "Año-mes",
+    "dim_date.date": "Fecha",
+    "fact_customer_changes.changed_at": "Fecha del cambio",
+    "fact_customer_changes.from_country": "País anterior",
+    "fact_customer_changes.to_country": "País nuevo",
+    "fact_customer_changes.from_version": "Versión anterior",
+    "fact_customer_changes.to_version": "Versión nueva"
+  },
   "pages": [
     {
-      "name": "Ventas",
+      "name": "Resumen de ventas",
+      "subtitle": "Importe, pedidos y clientes por fecha, canal y país al comprar",
       "visuals": [
-        {
-          "visual_type": "card",
-          "name": "card_ventas",
-          "x": 20,
-          "y": 90,
-          "width": 290,
-          "height": 140,
-          "title": "Ventas totales",
-          "fields": {
-            "Values": "orders.Ventas totales"
-          }
-        },
-        {
-          "visual_type": "card",
-          "name": "card_pedidos",
-          "x": 330,
-          "y": 90,
-          "width": 290,
-          "height": 140,
-          "title": "Pedidos",
-          "fields": {
-            "Values": "orders.Pedidos"
-          }
-        },
-        {
-          "visual_type": "card",
-          "name": "card_clientes",
-          "x": 640,
-          "y": 90,
-          "width": 290,
-          "height": 140,
-          "title": "Clientes con compras",
-          "fields": {
-            "Values": "orders.Clientes con compras"
-          }
-        },
-        {
-          "visual_type": "card",
-          "name": "card_ticket",
-          "x": 950,
-          "y": 90,
-          "width": 310,
-          "height": 140,
-          "title": "Ticket promedio",
-          "fields": {
-            "Values": "orders.Ticket promedio"
-          }
-        },
-        {
-          "visual_type": "clusteredBarChart",
-          "name": "bar_pais",
-          "x": 20,
-          "y": 245,
-          "width": 610,
-          "height": 250,
-          "title": "Ventas por país (gold)",
-          "fields": {
-            "Category": "sales_by_country.country",
-            "Y": "sales_by_country.Ventas por país"
-          }
-        },
-        {
-          "visual_type": "lineChart",
-          "name": "line_diaria",
-          "x": 650,
-          "y": 245,
-          "width": 610,
-          "height": 250,
-          "title": "Ventas diarias por canal (gold)",
-          "fields": {
-            "Category": "daily_sales_by_channel.order_date",
-            "Y": "daily_sales_by_channel.Ventas diarias",
-            "Series": "daily_sales_by_channel.channel"
-          },
-          "properties": {
-            "categoryAxis.axisType": "Categorical"
-          }
-        },
-        {
-          "visual_type": "tableEx",
-          "name": "tabla_pedidos",
-          "x": 20,
-          "y": 510,
-          "width": 1240,
-          "height": 200,
-          "title": "Pedidos (silver)",
-          "fields": {
-            "Values": [
-              "orders.order_id",
-              "orders.order_ts",
-              "orders.channel",
-              "customers.name",
-              "customers.country",
-              "orders.amount"
-            ]
-          }
-        }
+        { "visual_type": "slicer", "name": "slicer_canal", "x": 20, "y": 100, "width": 240, "height": 200,
+          "title": "Canal", "fields": { "Values": "dim_channel.channel_name" },
+          "filters": [{ "field": "dim_channel.channel_key", "type": "Advanced", "operator": "GreaterThan", "values": [0] }] },
+        { "visual_type": "slicer", "name": "slicer_mes", "x": 20, "y": 320, "width": 240, "height": 390,
+          "title": "Año-mes", "fields": { "Values": "dim_date.year_month" } },
+
+        { "visual_type": "card", "name": "card_importe", "x": 280, "y": 100, "width": 230, "height": 120,
+          "title": "Importe", "fields": { "Values": "fact_orders.Importe" },
+          "properties": { "labels.labelPrecision": 2 } },
+        { "visual_type": "card", "name": "card_pedidos", "x": 530, "y": 100, "width": 230, "height": 120,
+          "title": "Pedidos", "fields": { "Values": "fact_orders.Pedidos" },
+          "properties": { "labels.labelPrecision": 0 } },
+        { "visual_type": "card", "name": "card_clientes", "x": 780, "y": 100, "width": 230, "height": 120,
+          "title": "Clientes", "fields": { "Values": "fact_orders.Clientes" },
+          "properties": { "labels.labelPrecision": 0 } },
+        { "visual_type": "card", "name": "card_ticket", "x": 1030, "y": 100, "width": 230, "height": 120,
+          "title": "Ticket promedio", "fields": { "Values": "fact_orders.Ticket promedio" },
+          "properties": { "labels.labelPrecision": 2 } },
+
+        { "visual_type": "lineChart", "name": "line_importe_fecha", "x": 280, "y": 240, "width": 640, "height": 230,
+          "title": "Importe por fecha",
+          "fields": { "Category": "dim_date.date", "Y": "fact_orders.Importe" },
+          "sort": { "field": "dim_date.date", "direction": "Ascending" },
+          "properties": { "categoryAxis.axisType": "Categorical", "labels.show": true, "valueAxis.start": 0 } },
+        { "visual_type": "clusteredBarChart", "name": "bar_importe_canal", "x": 940, "y": 240, "width": 320, "height": 230,
+          "title": "Importe por canal",
+          "fields": { "Category": "dim_channel.channel_name", "Y": "fact_orders.Importe" },
+          "sort": { "field": "fact_orders.Importe", "direction": "Descending" } },
+        { "visual_type": "clusteredBarChart", "name": "bar_importe_pais", "x": 280, "y": 490, "width": 480, "height": 220,
+          "title": "Importe por país al comprar",
+          "fields": { "Category": "dim_customer.country", "Y": "fact_orders.Importe" },
+          "sort": { "field": "fact_orders.Importe", "direction": "Descending" } },
+        { "visual_type": "clusteredBarChart", "name": "bar_importe_cliente", "x": 780, "y": 490, "width": 480, "height": 220,
+          "title": "Importe por cliente",
+          "fields": { "Category": "dim_customer.name", "Y": "fact_orders.Importe" },
+          "sort": { "field": "fact_orders.Importe", "direction": "Descending" } }
       ]
     },
     {
-      "name": "Clientes",
+      "name": "Cambios de clientes",
+      "subtitle": "Historial SCD2: qué datos cambiaron, cuándo y en qué cliente",
       "visuals": [
-        {
-          "visual_type": "card",
-          "name": "card_actuales",
-          "x": 20,
-          "y": 90,
-          "width": 400,
-          "height": 140,
-          "title": "Clientes actuales",
-          "fields": {
-            "Values": "customers.Clientes actuales"
-          }
-        },
-        {
-          "visual_type": "card",
-          "name": "card_versiones",
-          "x": 440,
-          "y": 90,
-          "width": 400,
-          "height": 140,
-          "title": "Versiones (SCD2)",
-          "fields": {
-            "Values": "customers_history.Versiones"
-          }
-        },
-        {
-          "visual_type": "card",
-          "name": "card_cambios",
-          "x": 860,
-          "y": 90,
-          "width": 400,
-          "height": 140,
-          "title": "Cambios registrados",
-          "fields": {
-            "Values": "customers_history.Cambios registrados"
-          }
-        },
-        {
-          "visual_type": "tableEx",
-          "name": "tabla_clientes",
-          "x": 20,
-          "y": 245,
-          "width": 600,
-          "height": 465,
-          "title": "Clientes vigentes (SCD1)",
+        { "visual_type": "slicer", "name": "slicer_mes_cambios", "x": 20, "y": 100, "width": 240, "height": 610,
+          "title": "Año-mes", "fields": { "Values": "dim_date.year_month" } },
+
+        { "visual_type": "card", "name": "card_cambios", "x": 280, "y": 100, "width": 180, "height": 120,
+          "title": "Cambios", "fields": { "Values": "fact_customer_changes.Cambios" },
+          "properties": { "labels.labelPrecision": 0 } },
+        { "visual_type": "card", "name": "card_cambios_pais", "x": 480, "y": 100, "width": 180, "height": 120,
+          "title": "Cambios de país", "fields": { "Values": "fact_customer_changes.Cambios de país" },
+          "properties": { "labels.labelPrecision": 0 } },
+        { "visual_type": "card", "name": "card_cambios_email", "x": 680, "y": 100, "width": 180, "height": 120,
+          "title": "Cambios de email", "fields": { "Values": "fact_customer_changes.Cambios de email" },
+          "properties": { "labels.labelPrecision": 0 } },
+        { "visual_type": "card", "name": "card_cambios_nombre", "x": 880, "y": 100, "width": 180, "height": 120,
+          "title": "Cambios de nombre", "fields": { "Values": "fact_customer_changes.Cambios de nombre" },
+          "properties": { "labels.labelPrecision": 0 } },
+        { "visual_type": "card", "name": "card_clientes_cambios", "x": 1080, "y": 100, "width": 180, "height": 120,
+          "title": "Clientes con cambios", "fields": { "Values": "fact_customer_changes.Clientes con cambios" },
+          "properties": { "labels.labelPrecision": 0 } },
+
+        { "visual_type": "lineChart", "name": "line_cambios_fecha", "x": 280, "y": 240, "width": 980, "height": 200,
+          "title": "Cambios por fecha",
+          "fields": { "Category": "dim_date.date", "Y": "fact_customer_changes.Cambios" },
+          "sort": { "field": "dim_date.date", "direction": "Ascending" },
+          "properties": { "categoryAxis.axisType": "Categorical", "labels.show": true, "valueAxis.start": 0 } },
+        { "visual_type": "tableEx", "name": "tabla_cambios", "x": 280, "y": 460, "width": 980, "height": 250,
+          "title": "Detalle de cambios",
           "fields": {
             "Values": [
-              "customers.customer_id",
-              "customers.name",
-              "customers.email",
-              "customers.country",
-              "customers.version"
+              "dim_customer.name",
+              "fact_customer_changes.changed_at",
+              "fact_customer_changes.from_country",
+              "fact_customer_changes.to_country",
+              "fact_customer_changes.from_version",
+              "fact_customer_changes.to_version"
             ]
-          }
-        },
-        {
-          "visual_type": "tableEx",
-          "name": "tabla_historial",
-          "x": 640,
-          "y": 245,
-          "width": 620,
-          "height": 465,
-          "title": "Historial de versiones (SCD2)",
-          "fields": {
-            "Values": [
-              "customers_history.customer_id",
-              "customers_history.name",
-              "customers_history.country",
-              "customers_history.version",
-              "customers_history.__START_AT",
-              "customers_history.__END_AT",
-              "customers_history.Estado"
-            ]
-          }
-        }
+          },
+          "sort": { "field": "fact_customer_changes.changed_at", "direction": "Ascending" },
+          "properties": { "total.totals": false } }
       ]
     }
   ]

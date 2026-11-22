@@ -1,0 +1,32 @@
+{
+  "*": {
+    "general": [
+      { "responsive": true }
+    ],
+    "header": [
+      {
+        "show": false,
+        "fontFamily": "Segoe UI Semibold",
+        "textSize": 10,
+        "fontColor": { "solid": { "color": "#64748B" } }
+      }
+    ],
+    "items": [
+      {
+        "padding": 4,
+        "fontFamily": "Segoe UI",
+        "textSize": 10,
+        "fontColor": { "solid": { "color": "#1E293B" } },
+        "background": { "solid": { "color": "#FFFFFF" } },
+        "outlineColor": { "solid": { "color": "#E2E8F0" } },
+        "accessibilityContrastProperties": true
+      }
+    ],
+    "selection": [
+      { "selectAllCheckboxEnabled": false }
+    ],
+    "date": [
+      { "hideDatePickerButton": false }
+    ]
+  }
+}

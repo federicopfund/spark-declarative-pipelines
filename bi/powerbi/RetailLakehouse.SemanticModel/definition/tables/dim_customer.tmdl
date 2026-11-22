@@ -2,12 +2,6 @@
 table dim_customer
 	lineageTag: c99109fe-8807-5ae4-81d9-f828feabc47c
 
-	/// Clientes con una version vigente (excluye el miembro desconocido).
-	measure 'Clientes vigentes' = CALCULATE ( DISTINCTCOUNT ( dim_customer[customer_id] ), dim_customer[is_current] = TRUE (), dim_customer[customer_id] <> -1 )
-		formatString: #,0
-		displayFolder: Modelo estrella
-		lineageTag: 5a5424af-673b-55ba-bbcc-397b841b8c3e
-
 	column customer_sk
 		dataType: int64
 		isHidden

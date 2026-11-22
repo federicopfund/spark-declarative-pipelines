@@ -1,0 +1,39 @@
+{
+  "*": {
+    "categoryLabels": [
+      {
+        "show": false,
+        "color": { "solid": { "color": "#64748B" } },
+        "fontFamily": "Segoe UI",
+        "fontSize": 10
+      }
+    ],
+    "labels": [
+      {
+        "show": true,
+        "color": { "solid": { "color": "#312E81" } },
+        "fontFamily": "Segoe UI Semibold",
+        "fontSize": 30,
+        "labelDisplayUnits": 1,
+        "preserveWhitespace": false
+      }
+    ],
+    "title": [
+      {
+        "show": true,
+        "fontFamily": "Segoe UI Semibold",
+        "fontSize": 10,
+        "fontColor": { "solid": { "color": "#64748B" } }
+      }
+    ],
+    "border": [
+      { "show": true, "width": 1, "color": { "solid": { "color": "#E0E7FF" } }, "radius": 12 }
+    ],
+    "subTitle": [
+      { "show": false }
+    ],
+    "divider": [
+      { "show": false }
+    ]
+  }
+}

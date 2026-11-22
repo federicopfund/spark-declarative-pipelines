@@ -1,4 +1,0 @@
-expression SparkServer = "127.0.0.1:10000" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
-	lineageTag: bdb95959-962c-5d51-a48b-c0e9c5f5fd92
-
-	annotation PBI_ResultType = Text

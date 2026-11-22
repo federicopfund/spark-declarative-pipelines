@@ -142,7 +142,7 @@ cruzar procesos de negocio con los mismos filtros.
 | Dimensión | Grano | Origen | Lenguaje | Notas |
 |---|---|---|---|---|
 | `dim_customer` | Una versión de un cliente | `silver.customers_history` + `bronze.customers_cdc_events` | Python | SCD tipo 2 con vigencia por fecha |
-| `dim_date` | Un día | Rango de `silver.orders` y `silver.customers_history` | SQL | Años completos; nombres en español; semana ISO |
+| `dim_date` | Un día | Rango de `silver.orders` y `silver.customers_history` | SQL | Años completos y sin huecos; nombres en español; semana ISO; **sin miembro desconocido** |
 | `dim_channel` | Un canal | Lista fija | SQL | `channel_code` = valor de `orders.channel` |
 
 ### `dim_customer`: vigencia por fecha
@@ -208,9 +208,14 @@ Se calculan **desde `fact_orders`**, nunca directamente desde silver.
 | Clave sustituta | `*_sk`, `bigint`, `xxhash64` de la clave de negocio (+ versión) | `customer_sk` |
 | Clave de fecha | `date_key`, `int` `yyyyMMdd` | `20261101` |
 | Clave de dimensión fija | `*_key`, `int` | `channel_key` |
-| Miembro desconocido | Clave `-1` en cada dimensión | `customer_sk = -1` |
+| Miembro desconocido | Clave `-1` en cada dimensión, salvo `dim_date` (ver abajo) | `customer_sk = -1` |
 | Vigencia SCD2 | `[valid_from, valid_to)`; vigente hasta `9999-12-31 23:59:59` | |
 | Auditoría | `_loaded_at` (momento de carga) en todas las tablas gold | |
+
+**Excepción: `dim_date` no tiene miembro desconocido.** Power BI exige que la columna de fecha de una tabla de
+fechas sea única, sin blancos y sin huecos; una fila `-1` con fecha vacía (o con una fecha de relleno como
+1900-01-01) lo impide. Las fechas de los hechos nunca son desconocidas (`order_ts` y `event_ts` son obligatorios
+en bronze) y el control 03 verifica que cada `date_key` exista en el calendario.
 
 Las claves sustitutas son **hashes determinísticos** y no numeradores: los materialized views se recalculan
 completos en cada ejecución y un numerador cambiaría de valor, rompiendo las relaciones.

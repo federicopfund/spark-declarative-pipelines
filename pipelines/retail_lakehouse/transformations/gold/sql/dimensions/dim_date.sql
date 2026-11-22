@@ -2,11 +2,14 @@
 --
 -- Grano: un dia. Cubre años completos, desde el primer hasta el ultimo año con pedidos o eventos de
 -- clientes, asi que crece solo cuando llegan datos de un año nuevo.
--- date_key = yyyyMMdd (int). La fila -1 es el miembro desconocido.
--- Dias de la semana en formato ISO: 1 = lunes ... 7 = domingo.
+-- date_key = yyyyMMdd (int). Dias de la semana en formato ISO: 1 = lunes ... 7 = domingo.
+--
+-- Sin miembro desconocido (excepcion a la convencion del modelo): Power BI exige que la columna de fecha de
+-- una tabla de fechas sea unica, sin blancos y sin huecos. Las fechas de los hechos nunca son desconocidas
+-- (order_ts y event_ts son obligatorios en bronze) y el control de calidad 03 verifica la cobertura.
 
 CREATE MATERIALIZED VIEW dim_date
-COMMENT 'Calendar. Grain: one day (full years). date_key yyyyMMdd; -1 = unknown.'
+COMMENT 'Calendar. Grain: one day (full years, contiguous). date_key yyyyMMdd. No unknown member.'
 AS WITH bounds AS (
   SELECT
     make_date(year(min(d)), 1, 1)   AS first_day,
@@ -35,9 +38,4 @@ SELECT
              (dayofweek(date) + 5) % 7 + 1)                              AS day_name,
   dayofweek(date) IN (1, 7)                                              AS is_weekend,
   current_timestamp()                                                    AS _loaded_at
-FROM days
-
-UNION ALL
-
-SELECT -1, CAST(NULL AS DATE), NULL, NULL, NULL, 'Desconocido', 'Desconocido', NULL, NULL,
-       'Desconocido', NULL, current_timestamp();
+FROM days;

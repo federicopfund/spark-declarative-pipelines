@@ -1,0 +1,11 @@
+{
+  "*": {
+    "card": [
+      {
+        "outlineWeight": 2,
+        "barShow": true,
+        "barWeight": 2
+      }
+    ]
+  }
+}

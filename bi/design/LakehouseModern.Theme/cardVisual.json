@@ -1,0 +1,123 @@
+{
+  "*": {
+    "layout": [
+      {
+        "style": "Cards",
+        "paddingUniform": 16,
+        "cellPadding": 12,
+        "backgroundShow": true,
+        "backgroundFillColor": {
+          "solid": {
+            "color": "#FFFFFF"
+          }
+        },
+        "backgroundTransparency": 0,
+        "borderWidth": 1,
+        "borderStyle": "solid",
+        "borderColor": {
+          "solid": {
+            "color": "#E9ECEF"
+          }
+        },
+        "borderTransparency": 0,
+        "rectangleRoundedCurve": 6,
+        "contentOrder": "callout_image_referenceLabel"
+      }
+    ],
+    "accentBar": [
+      {
+        "show": true,
+        "position": "Left",
+        "width": 3,
+        "color": {
+          "solid": {
+            "color": "#404040"
+          }
+        },
+        "transparency": 0
+      }
+    ],
+    "value": [
+      {
+        "show": true,
+        "fontFamily": "Segoe UI Semibold",
+        "fontSize": 32,
+        "fontColor": {
+          "solid": {
+            "color": "#404040"
+          }
+        },
+        "horizontalAlignment": "left",
+        "textWrap": false
+      }
+    ],
+    "label": [
+      {
+        "show": true,
+        "position": "aboveValue",
+        "fontFamily": "Segoe UI",
+        "fontSize": 11,
+        "fontColor": {
+          "solid": {
+            "color": "#868E96"
+          }
+        },
+        "horizontalAlignment": "left",
+        "matchValueAlignment": true,
+        "bold": false
+      }
+    ],
+    "spacing": [
+      {
+        "verticalSpacing": 4
+      }
+    ],
+    "referenceLabelTitle": [
+      {
+        "show": true,
+        "titleFontFamily": "Segoe UI",
+        "titleFontSize": 10,
+        "titleFontColor": {
+          "solid": {
+            "color": "#909090"
+          }
+        },
+        "titleBold": false
+      }
+    ],
+    "referenceLabelValue": [
+      {
+        "show": true,
+        "valueFontFamily": "Segoe UI Semibold",
+        "valueFontSize": 11,
+        "valueFontColor": {
+          "solid": {
+            "color": "#404040"
+          }
+        }
+      }
+    ],
+    "referenceLabelLayout": [
+      {
+        "position": "below",
+        "arrangement": "columns",
+        "horizontalAlignment": "left"
+      }
+    ],
+    "outline": [
+      {
+        "show": false
+      }
+    ],
+    "divider": [
+      {
+        "show": false
+      }
+    ],
+    "shadowCustom": [
+      {
+        "show": false
+      }
+    ]
+  }
+}

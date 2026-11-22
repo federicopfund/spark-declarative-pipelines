@@ -59,6 +59,31 @@ function New-PipelineSpec {
     return $spec
 }
 
+function Invoke-Beeline([string[]]$Statements) {
+    # Corre sentencias SQL en el Thrift Server con beeline. Start-Process y archivos (no "& ... 2>&1"):
+    # en PowerShell 5.1 el stderr redirigido de un ejecutable corta el script. Sin -p, beeline espera la clave.
+    $sql = [IO.Path]::GetTempFileName(); $out = [IO.Path]::GetTempFileName()
+    [IO.File]::WriteAllText($sql, ($Statements -join ";`n") + ";`n", (New-Object Text.UTF8Encoding $false))
+    $beeline = "$env:SPARK_HOME\bin\beeline.cmd"
+    Start-Process cmd.exe -ArgumentList '/c', "`"`"$beeline`" -u $ThriftUrl -n pipeline -p pipeline --silent=true --outputformat=csv2 -f `"$sql`" < NUL > `"$out`" 2>&1`"" `
+        -WindowStyle Hidden -Wait
+    $lines = Get-Content $out | Where-Object { $_ -and $_ -notmatch 'SLF4J|incubator' }
+    Remove-Item $sql, $out -Force
+    return $lines
+}
+
+function Update-ThriftCache {
+    # El Thrift Server cachea que archivos Parquet forman cada tabla. El pipeline reescribe las tablas en cada
+    # corrida, asi que sin REFRESH una consulta (p. ej. Power BI) puede buscar archivos ya borrados
+    # (FAILED_READ_FILE.FILE_NOT_EXIST).
+    if (-not (Wait-TcpPort $ThriftPort 2)) { Write-Host '    [=] thrift-server not running: cache refresh skipped' -ForegroundColor DarkGray; return }
+    $tables = Invoke-Beeline @('SHOW TABLES IN retail') |
+        Where-Object { $_ -match '^retail,([^,]+),false$' } | ForEach-Object { $Matches[1] }
+    if (-not $tables) { Write-Host '    [!] no tables found in retail' -ForegroundColor Yellow; return }
+    Invoke-Beeline @($tables | ForEach-Object { "REFRESH TABLE retail.$_" }) | Out-Null
+    Write-Host "    [OK] thrift-server cache refreshed ($(@($tables).Count) tables)" -ForegroundColor Green
+}
+
 function Get-SparkDaemon([string]$MainClass) {
     Get-CimInstance Win32_Process -Filter "Name = 'java.exe'" |
         Where-Object { $_.CommandLine -like "*$MainClass*" }

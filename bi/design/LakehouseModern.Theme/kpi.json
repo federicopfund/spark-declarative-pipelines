@@ -1,0 +1,91 @@
+{
+  "*": {
+    "goals": [
+      {
+        "showDistance": true,
+        "showGoal": true,
+        "fontSize": 16,
+        "titleFontSize": 16,
+        "labelPrecision": 0,
+        "direction": "High is good",
+        "distanceFontColor": {
+          "solid": {
+            "color": "#BBBBBB"
+          }
+        },
+        "distanceFontFamily": "Segoe UI",
+        "distanceLabel": "Percent",
+        "goalFontColor": {
+          "solid": {
+            "color": "#868e96"
+          }
+        },
+        "goalFontFamily": "Segoe UI",
+        "goalText": "Target",
+        "bold": false,
+        "italic": false,
+        "underline": false,
+        "titleBold": false,
+        "titleItalic": false,
+        "titleUnderline": false
+      }
+    ],
+    "indicator": [
+      {
+        "showIcon": true,
+        "fontFamily": "Segoe UI Semibold",
+        "fontSize": 42,
+        "iconSize": 21,
+        "bold": false,
+        "italic": false,
+        "underline": false,
+        "fontColor": {
+          "solid": {
+            "color": "#868e96"
+          }
+        },
+        "indicatorDisplayUnits": 0,
+        "indicatorPrecision": 1,
+        "horizontalAlignment": "center",
+        "verticalAlignment": "middle"
+      }
+    ],
+    "lastDate": [
+      {
+        "show": false,
+        "lastDateFontFamily": "Segoe UI",
+        "fontSize": 16,
+        "bold": false,
+        "italic": false,
+        "underline": false,
+        "lastDateFontColor": {
+          "solid": {
+            "color": "#868e96"
+          }
+        }
+      }
+    ],
+    "status": [
+      {
+        "direction": "Positive"
+      }
+    ],
+    "trendline": [
+      {
+        "show": false,
+        "transparency": 0
+      }
+    ],
+    "subTitle": [
+      {
+        "show": false
+      }
+    ],
+    "spacing": [
+      {
+        "customizeSpacing": true,
+        "verticalSpacing": 8
+      }
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "*": {
+    "labels": [
+      { "show": false }
+    ],
+    "categoryAxis": [
+      { "axisType": "Categorical" }
+    ]
+  }
+}

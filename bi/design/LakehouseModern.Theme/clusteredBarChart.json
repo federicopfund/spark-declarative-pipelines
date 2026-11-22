@@ -1,0 +1,22 @@
+{
+  "*": {
+    "general": [
+      { "responsive": true }
+    ],
+    "labels": [
+      { "show": true, "labelPosition": "OutsideEnd", "fontSize": 9 }
+    ],
+    "valueAxis": [
+      { "show": false, "gridlineShow": false }
+    ],
+    "categoryAxis": [
+      { "fontSize": 10, "labelColor": { "solid": { "color": "#334155" } } }
+    ],
+    "dataPoint": [
+      { "fill": { "solid": { "color": "#4F46E5" } } }
+    ],
+    "legend": [
+      { "showGradientLegend": false }
+    ]
+  }
+}

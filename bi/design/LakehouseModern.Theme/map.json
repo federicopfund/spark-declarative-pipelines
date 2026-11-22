@@ -1,0 +1,10 @@
+{
+  "*": {
+    "bubbles": [
+      {
+        "bubbleSize": -10,
+        "markerRangeType": "auto"
+      }
+    ]
+  }
+}
